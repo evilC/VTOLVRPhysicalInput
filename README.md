@@ -5,7 +5,7 @@ Uses [MarshMello0/VTOLVR-ModLoader](https://github.com/MarshMello0/VTOLVR-ModLoa
 # Usage
 1. Install the Mod Manager
 1. Downoad a release zip from the [Releases Page](https://github.com/evilC/VTOLVRPhysicalInput/releases)  
-**DO NOT** use the green "Clone or Download" button on the main page!**
+**DO NOT use the green "Clone or Download" button on the main page!**
 1. Unzip the contents to your VTOL VR folder
 1. Open the Windows Joystick Control Panel (Click the Windows Start  button, type `Joy.cpl` and hit Enter)  
 1. Edit `VTOLVRPhysicalInputSettings.xml` in the `VTOLVR\VTOLVR_ModLoader\mods` folder
