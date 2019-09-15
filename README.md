@@ -1,5 +1,5 @@
 # VTOL VR Physical Input
-A mod for [VTOL VR](https://store.steampowered.com/app/667970/VTOL_VR/) to allow using physical input devices  
+A mod for [VTOL VR](https://store.steampowered.com/app/667970/VTOL_VR/) to allow using physical input devices (ie use a real joystick instead of the virtual reality joystick)  
 Uses [MarshMello0/VTOLVR-ModLoader](https://github.com/MarshMello0/VTOLVR-ModLoader)  
 
 # Usage
