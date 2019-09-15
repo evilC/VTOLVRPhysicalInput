@@ -1,4 +1,4 @@
-# VTOLVRPhysicalInput
+# VTOL VR Physical Input
 A mod for [VTOL VR](https://store.steampowered.com/app/667970/VTOL_VR/) to allow using physical input devices  
 Uses [MarshMello0/VTOLVR-ModLoader](https://github.com/MarshMello0/VTOLVR-ModLoader)  
 
