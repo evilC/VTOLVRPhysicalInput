@@ -57,4 +57,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)VTOLVRPhysicalInputSettings.xml" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

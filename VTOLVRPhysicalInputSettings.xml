@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+  <Setting>
+    <Name>RollAxis</Name>
+    <StickName>T.16000M</StickName>
+    <StickAxis>X</StickAxis>
+    <Invert>true</Invert>
+  </Setting>
+  <Setting>
+    <Name>PitchAxis</Name>
+    <StickName>T.16000M</StickName>
+    <StickAxis>Y</StickAxis>
+    <Invert>true</Invert>
+  </Setting>
+  <Setting>
+    <Name>YawAxis</Name>
+    <StickName>TWCS Throttle</StickName>
+    <StickAxis>RotationZ</StickAxis>
+    <Invert>false</Invert>
+  </Setting>
+</Settings>

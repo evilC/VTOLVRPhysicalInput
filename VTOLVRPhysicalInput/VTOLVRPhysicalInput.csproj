@@ -58,17 +58,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Setting.cs" />
+    <Compile Include="StickMapping.cs" />
     <Compile Include="VTOLVRPhysicalInputMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="VTOLVRPhysicalInputSettings.xml" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(ProjectDir)VTOLVRPhysicalInputSettings.xml" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)VTOLVRPhysicalInputSettings.xml" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
