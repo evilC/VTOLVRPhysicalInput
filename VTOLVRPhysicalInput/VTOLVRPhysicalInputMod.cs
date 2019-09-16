@@ -21,6 +21,7 @@ namespace VTOLVRPhysicalInput
         private bool _waitingForVrJoystick;
         private bool _pollingEnabled;
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>() {{"PitchAxis", 0}, {"RollAxis", 0}, {"YawAxis", 0}};
+        private readonly Dictionary<string, float> _vrThrottleValues = new Dictionary<string, float>() {{"ThrottleAxis", 0}};
         private readonly List<string> _polledStickNames = new List<string>();
         private readonly List<Joystick> _polledSticks = new List<Joystick>();
         private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
@@ -93,6 +94,7 @@ namespace VTOLVRPhysicalInput
             if (VrControlsAvailable())
             {
                 _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["PitchAxis"], _vrJoystickValues["YawAxis"], _vrJoystickValues["RollAxis"]));
+                _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValues["ThrottleAxis"]);
             }
         }
 
@@ -103,7 +105,6 @@ namespace VTOLVRPhysicalInput
                 var data = polledStick.GetBufferedData();
                 foreach (var state in data)
                 {
-                    var x = _stickMappings;
                     var mappedStick = _stickMappings[polledStick.Information.ProductName];
                     var ax = state.Offset.ToString();
                     foreach (var stickMapping in mappedStick)
@@ -111,8 +112,15 @@ namespace VTOLVRPhysicalInput
                         if (stickMapping.InputAxis == ax)
                         {
                             var value = ConvertAxisValue(state.Value, stickMapping.Invert);
-                            Log($"Stick: {polledStick.Information.ProductName}, Axis: {ax}, Input Value: {state.Value}, Output Value: {value}");
-                            _vrJoystickValues[stickMapping.OutputAxis] = value;
+                            Log($"Stick: {polledStick.Information.ProductName}, Axis: {ax}, Input Value: {state.Value}, Output Device: {stickMapping.OutputDevice}, Output Axis: {stickMapping.OutputAxis}, Output Value: {value}");
+                            if (stickMapping.OutputDevice == "Joystick")
+                            {
+                                _vrJoystickValues[stickMapping.OutputAxis] = value;
+                            }
+                            else
+                            {
+                                _vrThrottleValues[stickMapping.OutputAxis] = value;
+                            }
                             break;
                         }
                     }
@@ -194,7 +202,10 @@ namespace VTOLVRPhysicalInput
                         _stickMappings[setting.StickName] = new List<StickMapping>();
                     }
 
-                    _stickMappings[setting.StickName].Add(new StickMapping { InputAxis = setting.StickAxis, OutputAxis = setting.Name, Invert = setting.Invert});
+                    _stickMappings[setting.StickName].Add(new StickMapping
+                    {
+                        InputAxis = setting.StickAxis, OutputAxis = setting.Name, Invert = setting.Invert, OutputDevice = setting.OutputDevice
+                    });
                 }
                 
             }

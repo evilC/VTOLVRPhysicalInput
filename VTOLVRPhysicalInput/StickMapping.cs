@@ -9,6 +9,7 @@ namespace VTOLVRPhysicalInput
     {
         public string InputAxis { get; set; }
         public string OutputAxis { get; set; }
+        public string OutputDevice { get; set; }
         public bool Invert { get; set; }
     }
 }

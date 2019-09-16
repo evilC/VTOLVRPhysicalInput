@@ -10,6 +10,7 @@ namespace VTOLVRPhysicalInput
         public string Name { get; set; }
         public string StickName { get; set; }
         public string StickAxis { get; set; }
+        public string OutputDevice { get; set; }
         public bool Invert { get; set; }
     }
 }

@@ -2,20 +2,30 @@
 <Settings>
   <Setting>
     <Name>RollAxis</Name>
+    <OutputDevice>Joystick</OutputDevice>
     <StickName>T.16000M</StickName>
     <StickAxis>X</StickAxis>
     <Invert>true</Invert>
   </Setting>
   <Setting>
     <Name>PitchAxis</Name>
+    <OutputDevice>Joystick</OutputDevice>
     <StickName>T.16000M</StickName>
     <StickAxis>Y</StickAxis>
     <Invert>true</Invert>
   </Setting>
   <Setting>
     <Name>YawAxis</Name>
+    <OutputDevice>Joystick</OutputDevice>
     <StickName>TWCS Throttle</StickName>
     <StickAxis>RotationZ</StickAxis>
     <Invert>false</Invert>
+  </Setting>
+  <Setting>
+    <Name>ThrottleAxis</Name>
+    <OutputDevice>Throttle</OutputDevice>
+    <StickName>TWCS Throttle</StickName>
+    <StickAxis>Z</StickAxis>
+    <Invert>true</Invert>
   </Setting>
 </Settings>
