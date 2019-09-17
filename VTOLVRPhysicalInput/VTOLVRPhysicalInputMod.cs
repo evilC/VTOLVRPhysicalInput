@@ -2,10 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Xml;
 using System.Xml.Serialization;
-using Oculus.Platform.Models;
 using SharpDX.DirectInput;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,6 +19,7 @@ namespace VTOLVRPhysicalInput
         private bool _pollingEnabled;
 
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) {{"X", 0}, {"Y", 0}, {"Z", 0}};
+        private readonly Dictionary<string, float> _vrJoystickThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
         private float _vrJoystickTriggerValue;
 
         private float _vrThrottleValue = 0;
@@ -135,7 +133,34 @@ namespace VTOLVRPhysicalInput
                     }
                     else if (ov <= 44)
                     {
-                        // Hats
+                        // POV Hats
+                        if (mappedStick.PovToTouchpadMappings.TryGetValue(state.Offset, out var touchpadMapping))
+                        {
+                            Log(($"PovToTouchpad: POV={state.Offset}, Value={state.Value}, OutputDevice={touchpadMapping.OutputDevice}"));
+                            var output = touchpadMapping.OutputDevice == "Stick" ? _vrJoystickThumb : _vrThrottleThumb;
+                            output["X"] = 0;
+                            output["Y"] = 0;
+
+                            switch (state.Value)
+                            {
+                                case 0:
+                                    // Up
+                                    output["Y"] = -1;
+                                    break;
+                                case 9000:
+                                    // Right
+                                    output["X"] = 1;
+                                    break;
+                                case 18000:
+                                    // Down
+                                    output["Y"] = 1;
+                                    break;
+                                case 27000:
+                                    // Left
+                                    output["X"] = -1;
+                                    break;
+                            }
+                        }
                     }
                     else if (ov <= 175)
                     {
@@ -260,6 +285,11 @@ namespace VTOLVRPhysicalInput
                     {
                         mapping.ButtonToFloatMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToFloatMapping.InputButton)), buttonToFloatMapping);
                     }
+
+                    foreach (var povToTouchpadMapping in stick.PovToTouchpadMappings)
+                    {
+                        mapping.PovToTouchpadMappings.Add(JoystickOffsetFromName(PovNameFromIndex(povToTouchpadMapping.InputPov)), povToTouchpadMapping);
+                    }
                 }
             }
             else
@@ -272,6 +302,11 @@ namespace VTOLVRPhysicalInput
         private string ButtonNameFromIndex(int index)
         {
             return "Buttons" + (index - 1);
+        }
+
+        private string PovNameFromIndex(int index)
+        {
+            return "PointOfViewControllers" + (index - 1);
         }
 
         private JoystickOffset JoystickOffsetFromName(string n)
