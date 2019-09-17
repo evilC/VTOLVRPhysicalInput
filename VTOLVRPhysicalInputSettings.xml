@@ -1,14 +1,43 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Mappings>
-  <AxisToAxis>
-    <Name>A2A1</Name>
-  </AxisToAxis>
-  <AxisToAxis>
-    <Name>A2A2</Name>
-  </AxisToAxis>
-  <ButtonToButton>
-    <Name>B2B1</Name>
-  </ButtonToButton>
+  <StickMappings>
+    <StickName>T16000M</StickName>
+    <AxisToAxis>
+      <InputAxis>X</InputAxis>
+      <Invert>true</Invert>
+      <OutputDevice>Stick</OutputDevice>
+      <OutputAxis>z</OutputAxis>
+    </AxisToAxis>
+    <AxisToAxis>
+      <InputAxis>Y</InputAxis>
+      <Invert>true</Invert>
+      <OutputDevice>Stick</OutputDevice>
+      <OutputAxis>x</OutputAxis>
+    </AxisToAxis>
+    <ButtonToButton>
+      <Name>B2B1</Name>
+    </ButtonToButton>
+  </StickMappings>
+
+  <StickMappings>
+    <StickName>TWCS Throttle</StickName>
+    <AxisToAxis>
+      <InputAxis>RotationZ</InputAxis>
+      <Invert>false</Invert>
+      <OutputDevice>Stick</OutputDevice>
+      <OutputAxis>y</OutputAxis>
+    </AxisToAxis>
+    <AxisToAxis>
+      <InputAxis>Z</InputAxis>
+      <Invert>true</Invert>
+      <OutputDevice>Throttle</OutputDevice>
+      <OutputAxis>y</OutputAxis>
+    </AxisToAxis>
+    <ButtonToButton>
+      <Name>B2B1</Name>
+    </ButtonToButton>
+
+  </StickMappings>
 </Mappings>
 <!--<Settings>-->
   <!--<Setting>

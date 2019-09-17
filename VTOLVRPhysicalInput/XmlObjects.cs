@@ -8,6 +8,13 @@ namespace VTOLVRPhysicalInput
 {
     public class Mappings
     {
+        [XmlElement("StickMappings")]
+        public List<StickMappings> StickMappings = new List<StickMappings>();
+    }
+
+    public class StickMappings
+    {
+        public string StickName { get; set; }
         [XmlElement("AxisToAxis")]
         public List<AxisToAxisMapping> AxisToAxisMappings = new List<AxisToAxisMapping>();
         [XmlElement("ButtonToButton")]
@@ -16,27 +23,14 @@ namespace VTOLVRPhysicalInput
 
     public class AxisToAxisMapping
     {
-        public string Name { get; set; }
-        //public string HouseNo { get; set; }
-        //public string StreetName { get; set; }
-        //public string City { get; set; }
+        public string InputAxis { get; set; }
+        public bool Invert { get; set; }
+        public string OutputDevice { get; set; }
+        public string OutputAxis { get; set; }
     }
 
     public class ButtonToButtonMapping
     {
         public string Name { get; set; }
     }
-    //[XmlRoot("AxisToAxis")]
-    //public class AxisToAxisMapping
-    //{
-    //    [XmlElement("Name")]
-    //    public string Name { get; set; }
-    //}
-
-    //[XmlRoot("ButtonToButton")]
-    //public class ButtonToButtonMapping
-    //{
-    //    [XmlElement("Name")]
-    //    public string Name { get; set; }
-    //}
 }
