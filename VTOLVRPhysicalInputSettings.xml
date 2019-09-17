@@ -14,6 +14,10 @@
       <OutputDevice>Stick</OutputDevice>
       <OutputComponent>X</OutputComponent>
     </AxisToVectorComponent>
+    <PovToTouchpad>
+      <InputPov>1</InputPov>
+      <OutputDevice>Stick</OutputDevice>
+    </PovToTouchpad>
   </StickMappings>
 
   <StickMappings>
