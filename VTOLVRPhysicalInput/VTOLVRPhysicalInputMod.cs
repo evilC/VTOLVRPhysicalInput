@@ -20,9 +20,13 @@ namespace VTOLVRPhysicalInput
         private VRThrottle _vrThrottle;
         private bool _waitingForVrJoystick;
         private bool _pollingEnabled;
+
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) {{"X", 0}, {"Y", 0}, {"Z", 0}};
+        private float _vrJoystickTriggerValue;
+
         private float _vrThrottleValue = 0;
         private readonly Dictionary<string, float> _vrThrottleThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
+        private float _vrThrottleTriggerValue;
         private readonly MappingsDictionary _stickMappings = new MappingsDictionary();
 
         public void Start()
@@ -93,8 +97,11 @@ namespace VTOLVRPhysicalInput
             if (!VrControlsAvailable()) return;
 
             _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
+            _vrJoystick.OnTriggerAxis.Invoke(_vrJoystickTriggerValue);
+            
             _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValue);
             _vrThrottle.OnSetThumbstick.Invoke(new Vector3(_vrThrottleThumb["X"], _vrThrottleThumb["Y"], _vrThrottleThumb["Z"]));
+            _vrThrottle.OnTriggerAxis.Invoke(_vrThrottleTriggerValue);
         }
 
         public void PollSticks()
@@ -135,10 +142,23 @@ namespace VTOLVRPhysicalInput
                         // Buttons
                         if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonMapping))
                         {
-                            Log(($"ButtonToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={buttonMapping.OutputDevice}, Component={buttonMapping.OutputComponent}"));
+                            Log(($"ButtonToVector: Axis={state.Offset}, Value={state.Value}, OutputDevice={buttonMapping.OutputDevice}, Component={buttonMapping.OutputComponent}"));
                             if (buttonMapping.OutputDevice == "Throttle")
                             {
                                 _vrThrottleThumb[buttonMapping.OutputComponent] = state.Value == 128 ? buttonMapping.Direction : 0;
+                            }
+                        }
+
+                        if (mappedStick.ButtonToFloatMappings.TryGetValue(state.Offset, out var buttonToFloatMapping))
+                        {
+                            Log(($"ButtonToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={buttonToFloatMapping.OutputDevice}"));
+                            if (buttonToFloatMapping.OutputDevice == "Stick")
+                            {
+                                _vrJoystickTriggerValue = state.Value == 128 ? buttonToFloatMapping.PressValue : buttonToFloatMapping.ReleaseValue;
+                            }
+                            else if (buttonToFloatMapping.OutputDevice == "Throttle")
+                            {
+                                _vrThrottleTriggerValue = state.Value == 128 ? buttonToFloatMapping.PressValue : buttonToFloatMapping.ReleaseValue;
                             }
                         }
                     }
@@ -233,7 +253,12 @@ namespace VTOLVRPhysicalInput
 
                     foreach (var buttonToVectorComponentMapping in stick.ButtonToVectorComponentMappings)
                     {
-                        mapping.ButtonToVectorComponentMappings.Add(JoystickOffsetFromName("Buttons" + (buttonToVectorComponentMapping.InputButton - 1)), buttonToVectorComponentMapping);
+                        mapping.ButtonToVectorComponentMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToVectorComponentMapping.InputButton)), buttonToVectorComponentMapping);
+                    }
+
+                    foreach (var buttonToFloatMapping in stick.ButtonToFloatMappings)
+                    {
+                        mapping.ButtonToFloatMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToFloatMapping.InputButton)), buttonToFloatMapping);
                     }
                 }
             }
@@ -242,6 +267,11 @@ namespace VTOLVRPhysicalInput
                 Log($"{settingsFile} not found");
                 throw new Exception($"{settingsFile} not found");
             }
+        }
+
+        private string ButtonNameFromIndex(int index)
+        {
+            return "Buttons" + (index - 1);
         }
 
         private JoystickOffset JoystickOffsetFromName(string n)

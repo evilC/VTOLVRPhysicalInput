@@ -24,6 +24,8 @@ namespace VTOLVRPhysicalInput
         public List<AxisToFloatMapping> AxisToFloatMappings = new List<AxisToFloatMapping>();
         [XmlElement("ButtonToVectorComponent")]
         public List<ButtonToVectorComponent> ButtonToVectorComponentMappings = new List<ButtonToVectorComponent>();
+        [XmlElement("ButtonToFloat")]
+        public List<ButtonToFloat> ButtonToFloatMappings = new List<ButtonToFloat>();
     }
     #endregion
 
@@ -41,6 +43,7 @@ namespace VTOLVRPhysicalInput
         public Dictionary<JoystickOffset, AxisToVectorComponentMapping> AxisToVectorComponentMappings = new Dictionary<JoystickOffset, AxisToVectorComponentMapping>();
         public Dictionary<JoystickOffset, AxisToFloatMapping> AxisToFloatMappings = new Dictionary<JoystickOffset, AxisToFloatMapping>();
         public Dictionary<JoystickOffset, ButtonToVectorComponent> ButtonToVectorComponentMappings = new Dictionary<JoystickOffset, ButtonToVectorComponent>();
+        public Dictionary<JoystickOffset, ButtonToFloat> ButtonToFloatMappings = new Dictionary<JoystickOffset, ButtonToFloat>();
     }
     #endregion
 
@@ -66,6 +69,14 @@ namespace VTOLVRPhysicalInput
         public string OutputDevice { get; set; }
         public string OutputComponent { get; set; }
         public float Direction { get; set; }
+    }
+
+    public class ButtonToFloat
+    {
+        public int InputButton { get; set; }
+        public string OutputDevice { get; set; }
+        public float PressValue { get; set; }
+        public float ReleaseValue { get; set; }
     }
     #endregion
 }
