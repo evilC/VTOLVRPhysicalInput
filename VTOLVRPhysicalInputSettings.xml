@@ -6,13 +6,13 @@
       <InputAxis>X</InputAxis>
       <Invert>true</Invert>
       <OutputDevice>Stick</OutputDevice>
-      <OutputComponent>z</OutputComponent>
+      <OutputComponent>Z</OutputComponent>
     </AxisToVectorComponent>
     <AxisToVectorComponent>
       <InputAxis>Y</InputAxis>
       <Invert>true</Invert>
       <OutputDevice>Stick</OutputDevice>
-      <OutputComponent>x</OutputComponent>
+      <OutputComponent>X</OutputComponent>
     </AxisToVectorComponent>
   </StickMappings>
 
@@ -22,7 +22,7 @@
       <InputAxis>RotationZ</InputAxis>
       <Invert>false</Invert>
       <OutputDevice>Stick</OutputDevice>
-      <OutputComponent>y</OutputComponent>
+      <OutputComponent>Y</OutputComponent>
     </AxisToVectorComponent>
     <AxisToFloat>
       <InputAxis>Z</InputAxis>
@@ -32,13 +32,13 @@
     <ButtonToVectorComponent>
       <InputButton>7</InputButton>
       <OutputDevice>Throttle</OutputDevice>
-      <OutputComponent>y</OutputComponent>
+      <OutputComponent>Y</OutputComponent>
       <Direction>1</Direction>
     </ButtonToVectorComponent>
     <ButtonToVectorComponent>
       <InputButton>9</InputButton>
       <OutputDevice>Throttle</OutputDevice>
-      <OutputComponent>y</OutputComponent>
+      <OutputComponent>Y</OutputComponent>
       <Direction>-1</Direction>
     </ButtonToVectorComponent>
   </StickMappings>

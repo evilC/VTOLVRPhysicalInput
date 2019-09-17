@@ -20,9 +20,12 @@ namespace VTOLVRPhysicalInput
         private VRThrottle _vrThrottle;
         private bool _waitingForVrJoystick;
         private bool _pollingEnabled;
-        private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>() {{"PitchAxis", 0}, {"RollAxis", 0}, {"YawAxis", 0}};
-        private readonly Dictionary<string, float> _vrThrottleValues = new Dictionary<string, float>() {{"ThrottleAxis", 0}};
-        private readonly Vector3 _vrThrottleThumb = new Vector3(0, 0,0);
+        //private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>() {{"PitchAxis", 0}, {"RollAxis", 0}, {"YawAxis", 0}};
+        private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) {{"X", 0}, {"Y", 0}, {"Z", 0}};
+        //private readonly Dictionary<string, float> _vrThrottleValues = new Dictionary<string, float>() {{"ThrottleAxis", 0}};
+        private float _vrThrottleValue = 0;
+        //private readonly Vector3 _vrThrottleThumb = new Vector3(0, 0,0);
+        private readonly Dictionary<string, float> _vrThrottleThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
         //private readonly List<string> _polledStickNames = new List<string>();
         //private readonly List<Joystick> _polledSticks = new List<Joystick>();
         //private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
@@ -105,12 +108,11 @@ namespace VTOLVRPhysicalInput
             // Take state from physical stick and apply to VRJoystick
             PollSticks();
 
-            if (VrControlsAvailable())
-            {
-                _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["PitchAxis"], _vrJoystickValues["YawAxis"], _vrJoystickValues["RollAxis"]));
-                _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValues["ThrottleAxis"]);
-                _vrThrottle.OnSetThumbstick.Invoke(_vrThrottleThumb);
-            }
+            if (!VrControlsAvailable()) return;
+
+            _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
+            _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValue);
+            _vrThrottle.OnSetThumbstick.Invoke(new Vector3(_vrThrottleThumb["X"], _vrThrottleThumb["Y"], _vrThrottleThumb["Z"]));
         }
 
         public void PollSticks()
