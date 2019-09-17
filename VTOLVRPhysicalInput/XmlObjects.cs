@@ -19,8 +19,8 @@ namespace VTOLVRPhysicalInput
         public List<AxisToVectorComponentMapping> AxisToVectorComponentMappings = new List<AxisToVectorComponentMapping>();
         [XmlElement("AxisToFloat")]
         public List<AxisToFloatMapping> AxisToFloatMappings = new List<AxisToFloatMapping>();
-        [XmlElement("ButtonToButton")]
-        public List<ButtonToButtonMapping> ButtonToButtonMappings = new List<ButtonToButtonMapping>();
+        [XmlElement("ButtonToVectorComponent")]
+        public List<ButtonToVectorComponent> ButtonToVectorComponentMappings = new List<ButtonToVectorComponent>();
     }
 
     public class AxisToVectorComponentMapping
@@ -38,8 +38,11 @@ namespace VTOLVRPhysicalInput
         public string OutputDevice { get; set; }
     }
 
-    public class ButtonToButtonMapping
+    public class ButtonToVectorComponent
     {
-        public string Name { get; set; }
+        public string InputButton { get; set; }
+        public string OutputDevice { get; set; }
+        public string OutputComponent { get; set; }
+        public float Direction { get; set; }
     }
 }

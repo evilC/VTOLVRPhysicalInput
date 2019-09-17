@@ -14,9 +14,6 @@
       <OutputDevice>Stick</OutputDevice>
       <OutputComponent>x</OutputComponent>
     </AxisToVectorComponent>
-    <ButtonToButton>
-      <Name>B2B1</Name>
-    </ButtonToButton>
   </StickMappings>
 
   <StickMappings>
@@ -32,10 +29,18 @@
       <Invert>true</Invert>
       <OutputDevice>Throttle</OutputDevice>
     </AxisToFloat>
-    <ButtonToButton>
-      <Name>B2B1</Name>
-    </ButtonToButton>
-
+    <ButtonToVectorComponent>
+      <InputButton>7</InputButton>
+      <OutputDevice>Throttle</OutputDevice>
+      <OutputComponent>y</OutputComponent>
+      <Direction>1</Direction>
+    </ButtonToVectorComponent>
+    <ButtonToVectorComponent>
+      <InputButton>9</InputButton>
+      <OutputDevice>Throttle</OutputDevice>
+      <OutputComponent>y</OutputComponent>
+      <Direction>-1</Direction>
+    </ButtonToVectorComponent>
   </StickMappings>
 </Mappings>
 <!--<Settings>-->
