@@ -26,6 +26,7 @@ namespace VTOLVRPhysicalInput
         private readonly List<string> _polledStickNames = new List<string>();
         private readonly List<Joystick> _polledSticks = new List<Joystick>();
         private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
+        private Mappings _mappings;
 
         public void Start()
         {
@@ -217,30 +218,30 @@ namespace VTOLVRPhysicalInput
                 var deserializer = new XmlSerializer(typeof(Mappings));
                 TextReader reader = new StreamReader(settingsFile);
                 var obj = deserializer.Deserialize(reader);
-                var XmlData = (Mappings)obj;
+                _mappings = (Mappings)obj;
                 reader.Close();
 
                 // Build Dictionary
                 // ToDo: How to do this as part of XML Deserialization?
-                foreach (var stick in XmlData.MappingsList)
+                foreach (var stick in _mappings.MappingsList)
                 {
-                    if (!XmlData.Sticks.ContainsKey(stick.StickName))
+                    if (!_mappings.Sticks.ContainsKey(stick.StickName))
                     {
-                        XmlData.Sticks.Add(stick.StickName, new StickMappings());
+                        _mappings.Sticks.Add(stick.StickName, new StickMappings());
                     }
                     foreach (var axisToVectorComponentMapping in stick.AxisToVectorComponentMappings)
                     {
-                        XmlData.Sticks[stick.StickName].AxisToVectorComponentMappings.Add(axisToVectorComponentMapping.InputAxis, axisToVectorComponentMapping);
+                        _mappings.Sticks[stick.StickName].AxisToVectorComponentMappings.Add(JoystickOffsetFromName(axisToVectorComponentMapping.InputAxis), axisToVectorComponentMapping);
                     }
 
                     foreach (var axisToFloatMapping in stick.AxisToFloatMappings)
                     {
-                        XmlData.Sticks[stick.StickName].AxisToFloatMappings.Add(axisToFloatMapping.InputAxis, axisToFloatMapping);
+                        _mappings.Sticks[stick.StickName].AxisToFloatMappings.Add(JoystickOffsetFromName(axisToFloatMapping.InputAxis), axisToFloatMapping);
                     }
 
                     foreach (var buttonToVectorComponentMapping in stick.ButtonToVectorComponentMappings)
                     {
-                        XmlData.Sticks[stick.StickName].ButtonToVectorComponentMappings.Add("Buttons" + (buttonToVectorComponentMapping.InputButton - 1), buttonToVectorComponentMapping);
+                        _mappings.Sticks[stick.StickName].ButtonToVectorComponentMappings.Add(JoystickOffsetFromName("Buttons" + (buttonToVectorComponentMapping.InputButton - 1)), buttonToVectorComponentMapping);
                     }
                 }
 
@@ -273,6 +274,11 @@ namespace VTOLVRPhysicalInput
                 Log($"{settingsFile} not found");
                 throw new Exception($"{settingsFile} not found");
             }
+        }
+
+        private JoystickOffset JoystickOffsetFromName(string n)
+        {
+            return (JoystickOffset)Enum.Parse(typeof(JoystickOffset), n);
         }
 
         private void ThrowError(string text)

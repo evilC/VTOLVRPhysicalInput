@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using SharpDX.DirectInput;
 
 namespace VTOLVRPhysicalInput
 {
@@ -28,9 +29,9 @@ namespace VTOLVRPhysicalInput
 
     public class StickMappings
     {
-        public Dictionary<string, AxisToVectorComponentMapping> AxisToVectorComponentMappings = new Dictionary<string, AxisToVectorComponentMapping>();
-        public Dictionary<string, AxisToFloatMapping> AxisToFloatMappings = new Dictionary<string, AxisToFloatMapping>();
-        public Dictionary<string, ButtonToVectorComponent> ButtonToVectorComponentMappings = new Dictionary<string, ButtonToVectorComponent>();
+        public Dictionary<JoystickOffset, AxisToVectorComponentMapping> AxisToVectorComponentMappings = new Dictionary<JoystickOffset, AxisToVectorComponentMapping>();
+        public Dictionary<JoystickOffset, AxisToFloatMapping> AxisToFloatMappings = new Dictionary<JoystickOffset, AxisToFloatMapping>();
+        public Dictionary<JoystickOffset, ButtonToVectorComponent> ButtonToVectorComponentMappings = new Dictionary<JoystickOffset, ButtonToVectorComponent>();
     }
 
     public class AxisToVectorComponentMapping
