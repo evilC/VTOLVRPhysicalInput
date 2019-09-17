@@ -7,15 +7,12 @@ using SharpDX.DirectInput;
 
 namespace VTOLVRPhysicalInput
 {
+    #region Load-Time Objects
     public class Mappings
     {
-        // Used at load-time to parse XML
         [XmlElement("StickMappings")]
         public List<StickMappingList> MappingsList = new List<StickMappingList>();
 
-        // Used at run-time to process input
-        [XmlIgnore]
-        public Dictionary<string, StickMappings> Sticks = new Dictionary<string, StickMappings>();
     }
 
     // Used at load-time to parse XML
@@ -29,6 +26,14 @@ namespace VTOLVRPhysicalInput
         [XmlElement("ButtonToVectorComponent")]
         public List<ButtonToVectorComponent> ButtonToVectorComponentMappings = new List<ButtonToVectorComponent>();
     }
+    #endregion
+
+    #region Run-Time Objects
+    public class MappingsDictionary
+    {
+        public Dictionary<string, StickMappings> Sticks = new Dictionary<string, StickMappings>();
+
+    }
 
     // Used at run-time to process input
     public class StickMappings
@@ -39,7 +44,9 @@ namespace VTOLVRPhysicalInput
         public Dictionary<JoystickOffset, AxisToFloatMapping> AxisToFloatMappings = new Dictionary<JoystickOffset, AxisToFloatMapping>();
         public Dictionary<JoystickOffset, ButtonToVectorComponent> ButtonToVectorComponentMappings = new Dictionary<JoystickOffset, ButtonToVectorComponent>();
     }
+    #endregion
 
+    #region Common Objects
     public class AxisToVectorComponentMapping
     {
         public string InputAxis { get; set; }
@@ -62,4 +69,5 @@ namespace VTOLVRPhysicalInput
         public string OutputComponent { get; set; }
         public float Direction { get; set; }
     }
+    #endregion
 }

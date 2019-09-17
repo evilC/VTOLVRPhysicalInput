@@ -22,11 +22,11 @@ namespace VTOLVRPhysicalInput
         private bool _pollingEnabled;
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>() {{"PitchAxis", 0}, {"RollAxis", 0}, {"YawAxis", 0}};
         private readonly Dictionary<string, float> _vrThrottleValues = new Dictionary<string, float>() {{"ThrottleAxis", 0}};
-        private Vector3 _vrThrottleThumb = new Vector3(0, 0,0);
+        private readonly Vector3 _vrThrottleThumb = new Vector3(0, 0,0);
         //private readonly List<string> _polledStickNames = new List<string>();
         //private readonly List<Joystick> _polledSticks = new List<Joystick>();
         //private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
-        private Mappings _stickMappings;
+        private readonly MappingsDictionary _stickMappings = new MappingsDictionary();
 
         public void Start()
         {
@@ -263,12 +263,12 @@ namespace VTOLVRPhysicalInput
                 var deserializer = new XmlSerializer(typeof(Mappings));
                 TextReader reader = new StreamReader(settingsFile);
                 var obj = deserializer.Deserialize(reader);
-                _stickMappings = (Mappings)obj;
+                var stickMappings = (Mappings)obj;
                 reader.Close();
 
                 // Build Dictionary
                 // ToDo: How to do this as part of XML Deserialization?
-                foreach (var stick in _stickMappings.MappingsList)
+                foreach (var stick in stickMappings.MappingsList)
                 {
                     if (!_stickMappings.Sticks.ContainsKey(stick.StickName))
                     {
