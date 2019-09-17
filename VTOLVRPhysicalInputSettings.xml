@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Mappings>
   <StickMappings>
-    <StickName>T16000M</StickName>
+    <StickName>T.16000M</StickName>
     <AxisToVectorComponent>
       <InputAxis>X</InputAxis>
       <Invert>true</Invert>

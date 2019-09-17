@@ -23,10 +23,10 @@ namespace VTOLVRPhysicalInput
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>() {{"PitchAxis", 0}, {"RollAxis", 0}, {"YawAxis", 0}};
         private readonly Dictionary<string, float> _vrThrottleValues = new Dictionary<string, float>() {{"ThrottleAxis", 0}};
         private Vector3 _vrThrottleThumb = new Vector3(0, 0,0);
-        private readonly List<string> _polledStickNames = new List<string>();
-        private readonly List<Joystick> _polledSticks = new List<Joystick>();
-        private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
-        private Mappings _mappings;
+        //private readonly List<string> _polledStickNames = new List<string>();
+        //private readonly List<Joystick> _polledSticks = new List<Joystick>();
+        //private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
+        private Mappings _stickMappings;
 
         public void Start()
         {
@@ -51,16 +51,28 @@ namespace VTOLVRPhysicalInput
                 foundSticks.Add(foundStick.Information.ProductName, foundStick);
             }
 
-            foreach (var polledStickName in _polledStickNames)
+            //foreach (var polledStickName in _polledStickNames)
+            //{
+            //    if (!foundSticks.ContainsKey(polledStickName))
+            //    {
+            //        ThrowError($"Joystick {polledStickName} not found");
+            //    }
+            //    Log($"Joystick {polledStickName} found");
+            //    foundSticks[polledStickName].Properties.BufferSize = 128;
+            //    foundSticks[polledStickName].Acquire();
+            //    _polledSticks.Add(foundSticks[polledStickName]);
+            //}
+
+            foreach (var polledStick in _stickMappings.Sticks)
             {
-                if (!foundSticks.ContainsKey(polledStickName))
+                if (!foundSticks.ContainsKey(polledStick.Key))
                 {
-                    ThrowError($"Joystick {polledStickName} not found");
+                    ThrowError($"Joystick {polledStick.Value.Stick} not found");
                 }
-                Log($"Joystick {polledStickName} found");
-                foundSticks[polledStickName].Properties.BufferSize = 128;
-                foundSticks[polledStickName].Acquire();
-                _polledSticks.Add(foundSticks[polledStickName]);
+                Log($"Joystick {polledStick.Key} found");
+                polledStick.Value.Stick = foundSticks[polledStick.Key];
+                polledStick.Value.Stick.Properties.BufferSize = 128;
+                polledStick.Value.Stick.Acquire();
             }
 
         }
@@ -103,57 +115,90 @@ namespace VTOLVRPhysicalInput
 
         public void PollSticks()
         {
-            foreach (var polledStick in _polledSticks)
+            foreach (var mappedStick in _stickMappings.Sticks.Values)
             {
-                var data = polledStick.GetBufferedData();
+                var data = mappedStick.Stick.GetBufferedData();
                 foreach (var state in data)
                 {
-                    var mappedStick = _stickMappings[polledStick.Information.ProductName];
-                    var ax = state.Offset.ToString();
-                    foreach (var stickMapping in mappedStick)
+                    var ov = (int)state.Offset;
+                    if (ov <= 28)
                     {
-                        if (stickMapping.InputAxis == ax)
+                        // Axes
+                        if (mappedStick.AxisToVectorComponentMappings.TryGetValue(state.Offset, out var vectorComponentMapping))
                         {
-                            var value = ConvertAxisValue(state.Value, stickMapping.Invert);
-                            Log($"Stick: {polledStick.Information.ProductName}, Axis: {ax}, Input Value: {state.Value}, Output Device: {stickMapping.OutputDevice}, Output Axis: {stickMapping.OutputAxis}, Output Value: {value}");
-                            if (stickMapping.OutputDevice == "Joystick")
-                            {
-                                _vrJoystickValues[stickMapping.OutputAxis] = value;
-                            }
-                            else
-                            {
-                                _vrThrottleValues[stickMapping.OutputAxis] = value;
-                            }
-                            break;
+                            Log(($"AxisToVector: Axis={state.Offset}, Value={state.Value}, OutputDevice={vectorComponentMapping.OutputDevice}, Component={vectorComponentMapping.OutputComponent}"));
+                        }
+
+                        if (mappedStick.AxisToFloatMappings.TryGetValue(state.Offset, out var floatMapping))
+                        {
+                            Log(($"AxisToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={floatMapping.OutputDevice}"));
                         }
                     }
-                    if (state.Offset == JoystickOffset.Buttons6)
+                    else if (ov <= 44)
                     {
-                        Log($"B7: {state.Value}");
-                        if (state.Value == 128)
-                        {
-                            _vrThrottleThumb.y = 1;
-                        }
-                        else
-                        {
-                            _vrThrottleThumb.y = 0;
-                        }
-                        
+                        // Hats
                     }
-                    else if (state.Offset == JoystickOffset.Buttons8)
+                    else if (ov <= 175)
                     {
-                        Log($"B9: {state.Value}");
-                        if (state.Value == 128)
+                        // Buttons
+                        if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonMapping))
                         {
-                            _vrThrottleThumb.y = -1;
-                        }
-                        else
-                        {
-                            _vrThrottleThumb.y = 0;
+                            Log(($"ButtonToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={buttonMapping.OutputDevice}, Component={buttonMapping.OutputComponent}"));
                         }
                     }
                 }
             }
+            //foreach (var polledStick in _polledSticks)
+            //{
+            //    var data = polledStick.GetBufferedData();
+            //    foreach (var state in data)
+            //    {
+            //        var mappedStick = _stickMappings[polledStick.Information.ProductName];
+            //        var ax = state.Offset.ToString();
+            //        foreach (var stickMapping in mappedStick)
+            //        {
+            //            if (stickMapping.InputAxis == ax)
+            //            {
+            //                var value = ConvertAxisValue(state.Value, stickMapping.Invert);
+            //                Log($"Stick: {polledStick.Information.ProductName}, Axis: {ax}, Input Value: {state.Value}, Output Device: {stickMapping.OutputDevice}, Output Axis: {stickMapping.OutputAxis}, Output Value: {value}");
+            //                if (stickMapping.OutputDevice == "Joystick")
+            //                {
+            //                    _vrJoystickValues[stickMapping.OutputAxis] = value;
+            //                }
+            //                else
+            //                {
+            //                    _vrThrottleValues[stickMapping.OutputAxis] = value;
+            //                }
+            //                break;
+            //            }
+            //        }
+            //        if (state.Offset == JoystickOffset.Buttons6)
+            //        {
+            //            Log($"B7: {state.Value}");
+            //            if (state.Value == 128)
+            //            {
+            //                _vrThrottleThumb.y = 1;
+            //            }
+            //            else
+            //            {
+            //                _vrThrottleThumb.y = 0;
+            //            }
+
+            //        }
+            //        else if (state.Offset == JoystickOffset.Buttons8)
+            //        {
+            //            Log($"B9: {state.Value}");
+            //            if (state.Value == 128)
+            //            {
+            //                _vrThrottleThumb.y = -1;
+            //            }
+            //            else
+            //            {
+            //                _vrThrottleThumb.y = 0;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         private IEnumerator FindScripts()
@@ -218,34 +263,35 @@ namespace VTOLVRPhysicalInput
                 var deserializer = new XmlSerializer(typeof(Mappings));
                 TextReader reader = new StreamReader(settingsFile);
                 var obj = deserializer.Deserialize(reader);
-                _mappings = (Mappings)obj;
+                _stickMappings = (Mappings)obj;
                 reader.Close();
 
                 // Build Dictionary
                 // ToDo: How to do this as part of XML Deserialization?
-                foreach (var stick in _mappings.MappingsList)
+                foreach (var stick in _stickMappings.MappingsList)
                 {
-                    if (!_mappings.Sticks.ContainsKey(stick.StickName))
+                    if (!_stickMappings.Sticks.ContainsKey(stick.StickName))
                     {
-                        _mappings.Sticks.Add(stick.StickName, new StickMappings());
+                        _stickMappings.Sticks.Add(stick.StickName, new StickMappings(){StickName = stick.StickName});
                     }
+
+                    var mapping = _stickMappings.Sticks[stick.StickName];
                     foreach (var axisToVectorComponentMapping in stick.AxisToVectorComponentMappings)
                     {
-                        _mappings.Sticks[stick.StickName].AxisToVectorComponentMappings.Add(JoystickOffsetFromName(axisToVectorComponentMapping.InputAxis), axisToVectorComponentMapping);
+                        mapping.AxisToVectorComponentMappings.Add(JoystickOffsetFromName(axisToVectorComponentMapping.InputAxis), axisToVectorComponentMapping);
                     }
 
                     foreach (var axisToFloatMapping in stick.AxisToFloatMappings)
                     {
-                        _mappings.Sticks[stick.StickName].AxisToFloatMappings.Add(JoystickOffsetFromName(axisToFloatMapping.InputAxis), axisToFloatMapping);
+                        mapping.AxisToFloatMappings.Add(JoystickOffsetFromName(axisToFloatMapping.InputAxis), axisToFloatMapping);
                     }
 
                     foreach (var buttonToVectorComponentMapping in stick.ButtonToVectorComponentMappings)
                     {
-                        _mappings.Sticks[stick.StickName].ButtonToVectorComponentMappings.Add(JoystickOffsetFromName("Buttons" + (buttonToVectorComponentMapping.InputButton - 1)), buttonToVectorComponentMapping);
+                        mapping.ButtonToVectorComponentMappings.Add(JoystickOffsetFromName("Buttons" + (buttonToVectorComponentMapping.InputButton - 1)), buttonToVectorComponentMapping);
                     }
                 }
 
-                var debug = "me";
                 /*
                 var serializer = new XmlSerializer(typeof(List<Setting>), new XmlRootAttribute("Settings"));
                 var stringReader = new StringReader(File.ReadAllText(settingsFile));
