@@ -1,6 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Settings>
-  <Setting>
+<Mappings>
+  <AxisToAxis>
+    <Name>A2A1</Name>
+  </AxisToAxis>
+  <AxisToAxis>
+    <Name>A2A2</Name>
+  </AxisToAxis>
+  <ButtonToButton>
+    <Name>B2B1</Name>
+  </ButtonToButton>
+</Mappings>
+<!--<Settings>-->
+  <!--<Setting>
     <Name>RollAxis</Name>
     <OutputDevice>Joystick</OutputDevice>
     <StickName>T.16000M</StickName>
@@ -27,5 +38,15 @@
     <StickName>TWCS Throttle</StickName>
     <StickAxis>Z</StickAxis>
     <Invert>true</Invert>
-  </Setting>
-</Settings>
+  </Setting>-->
+  <!--<AxisToAxisMappings>
+    <AxisToAxis>
+      <Name>A2A1</Name>
+    </AxisToAxis>
+  </AxisToAxisMappings>-->
+  <!--<ButtonToButtonMappings>-->
+    <!--<ButtonToButton>
+      <Name>B2B1</Name>
+    </ButtonToButton>-->
+  <!--</ButtonToButtonMappings>-->
+<!--</Settings>-->

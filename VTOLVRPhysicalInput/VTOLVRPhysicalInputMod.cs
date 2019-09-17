@@ -214,6 +214,12 @@ namespace VTOLVRPhysicalInput
             
             if (File.Exists(settingsFile))
             {
+                var deserializer = new XmlSerializer(typeof(Mappings));
+                TextReader reader = new StreamReader(settingsFile);
+                var obj = deserializer.Deserialize(reader);
+                var XmlData = (Mappings)obj;
+                reader.Close();
+                /*
                 var serializer = new XmlSerializer(typeof(List<Setting>), new XmlRootAttribute("Settings"));
                 var stringReader = new StringReader(File.ReadAllText(settingsFile));
                 var settings = (List<Setting>)serializer.Deserialize(stringReader);
@@ -234,7 +240,7 @@ namespace VTOLVRPhysicalInput
                         InputAxis = setting.StickAxis, OutputAxis = setting.Name, Invert = setting.Invert, OutputDevice = setting.OutputDevice
                     });
                 }
-                
+                */
             }
             else
             {
