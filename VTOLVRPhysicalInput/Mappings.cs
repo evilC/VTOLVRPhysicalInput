@@ -12,7 +12,6 @@ namespace VTOLVRPhysicalInput
     {
         [XmlElement("StickMappings")]
         public List<StickMappingList> MappingsList = new List<StickMappingList>();
-
     }
 
     // Used at load-time to parse XML
@@ -32,7 +31,6 @@ namespace VTOLVRPhysicalInput
     public class MappingsDictionary
     {
         public Dictionary<string, StickMappings> Sticks = new Dictionary<string, StickMappings>();
-
     }
 
     // Used at run-time to process input

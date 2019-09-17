@@ -20,15 +20,9 @@ namespace VTOLVRPhysicalInput
         private VRThrottle _vrThrottle;
         private bool _waitingForVrJoystick;
         private bool _pollingEnabled;
-        //private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>() {{"PitchAxis", 0}, {"RollAxis", 0}, {"YawAxis", 0}};
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) {{"X", 0}, {"Y", 0}, {"Z", 0}};
-        //private readonly Dictionary<string, float> _vrThrottleValues = new Dictionary<string, float>() {{"ThrottleAxis", 0}};
         private float _vrThrottleValue = 0;
-        //private readonly Vector3 _vrThrottleThumb = new Vector3(0, 0,0);
         private readonly Dictionary<string, float> _vrThrottleThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
-        //private readonly List<string> _polledStickNames = new List<string>();
-        //private readonly List<Joystick> _polledSticks = new List<Joystick>();
-        //private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
         private readonly MappingsDictionary _stickMappings = new MappingsDictionary();
 
         public void Start()
@@ -53,18 +47,6 @@ namespace VTOLVRPhysicalInput
                 if (foundSticks.ContainsKey(foundStick.Information.ProductName)) continue; // ToDo: Handle duplicate stick names?
                 foundSticks.Add(foundStick.Information.ProductName, foundStick);
             }
-
-            //foreach (var polledStickName in _polledStickNames)
-            //{
-            //    if (!foundSticks.ContainsKey(polledStickName))
-            //    {
-            //        ThrowError($"Joystick {polledStickName} not found");
-            //    }
-            //    Log($"Joystick {polledStickName} found");
-            //    foundSticks[polledStickName].Properties.BufferSize = 128;
-            //    foundSticks[polledStickName].Acquire();
-            //    _polledSticks.Add(foundSticks[polledStickName]);
-            //}
 
             foreach (var polledStick in _stickMappings.Sticks)
             {
@@ -162,57 +144,6 @@ namespace VTOLVRPhysicalInput
                     }
                 }
             }
-            //foreach (var polledStick in _polledSticks)
-            //{
-            //    var data = polledStick.GetBufferedData();
-            //    foreach (var state in data)
-            //    {
-            //        var mappedStick = _stickMappings[polledStick.Information.ProductName];
-            //        var ax = state.Offset.ToString();
-            //        foreach (var stickMapping in mappedStick)
-            //        {
-            //            if (stickMapping.InputAxis == ax)
-            //            {
-            //                var value = ConvertAxisValue(state.Value, stickMapping.Invert);
-            //                Log($"Stick: {polledStick.Information.ProductName}, Axis: {ax}, Input Value: {state.Value}, Output Device: {stickMapping.OutputDevice}, Output Axis: {stickMapping.OutputAxis}, Output Value: {value}");
-            //                if (stickMapping.OutputDevice == "Joystick")
-            //                {
-            //                    _vrJoystickValues[stickMapping.OutputAxis] = value;
-            //                }
-            //                else
-            //                {
-            //                    _vrThrottleValues[stickMapping.OutputAxis] = value;
-            //                }
-            //                break;
-            //            }
-            //        }
-            //        if (state.Offset == JoystickOffset.Buttons6)
-            //        {
-            //            Log($"B7: {state.Value}");
-            //            if (state.Value == 128)
-            //            {
-            //                _vrThrottleThumb.y = 1;
-            //            }
-            //            else
-            //            {
-            //                _vrThrottleThumb.y = 0;
-            //            }
-
-            //        }
-            //        else if (state.Offset == JoystickOffset.Buttons8)
-            //        {
-            //            Log($"B9: {state.Value}");
-            //            if (state.Value == 128)
-            //            {
-            //                _vrThrottleThumb.y = -1;
-            //            }
-            //            else
-            //            {
-            //                _vrThrottleThumb.y = 0;
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         private IEnumerator FindScripts()
@@ -305,29 +236,6 @@ namespace VTOLVRPhysicalInput
                         mapping.ButtonToVectorComponentMappings.Add(JoystickOffsetFromName("Buttons" + (buttonToVectorComponentMapping.InputButton - 1)), buttonToVectorComponentMapping);
                     }
                 }
-
-                /*
-                var serializer = new XmlSerializer(typeof(List<Setting>), new XmlRootAttribute("Settings"));
-                var stringReader = new StringReader(File.ReadAllText(settingsFile));
-                var settings = (List<Setting>)serializer.Deserialize(stringReader);
-                foreach (var setting in settings)
-                {
-                    if (!_polledStickNames.Contains(setting.StickName))
-                    {
-                        _polledStickNames.Add(setting.StickName);
-                    }
-
-                    if (!_stickMappings.ContainsKey(setting.StickName))
-                    {
-                        _stickMappings[setting.StickName] = new List<StickMapping>();
-                    }
-
-                    _stickMappings[setting.StickName].Add(new StickMapping
-                    {
-                        InputAxis = setting.StickAxis, OutputAxis = setting.Name, Invert = setting.Invert, OutputDevice = setting.OutputDevice
-                    });
-                }
-                */
             }
             else
             {
