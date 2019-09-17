@@ -219,6 +219,32 @@ namespace VTOLVRPhysicalInput
                 var obj = deserializer.Deserialize(reader);
                 var XmlData = (Mappings)obj;
                 reader.Close();
+
+                // Build Dictionary
+                // ToDo: How to do this as part of XML Deserialization?
+                foreach (var stick in XmlData.MappingsList)
+                {
+                    if (!XmlData.Sticks.ContainsKey(stick.StickName))
+                    {
+                        XmlData.Sticks.Add(stick.StickName, new StickMappings());
+                    }
+                    foreach (var axisToVectorComponentMapping in stick.AxisToVectorComponentMappings)
+                    {
+                        XmlData.Sticks[stick.StickName].AxisToVectorComponentMappings.Add(axisToVectorComponentMapping.InputAxis, axisToVectorComponentMapping);
+                    }
+
+                    foreach (var axisToFloatMapping in stick.AxisToFloatMappings)
+                    {
+                        XmlData.Sticks[stick.StickName].AxisToFloatMappings.Add(axisToFloatMapping.InputAxis, axisToFloatMapping);
+                    }
+
+                    foreach (var buttonToVectorComponentMapping in stick.ButtonToVectorComponentMappings)
+                    {
+                        XmlData.Sticks[stick.StickName].ButtonToVectorComponentMappings.Add("Buttons" + (buttonToVectorComponentMapping.InputButton - 1), buttonToVectorComponentMapping);
+                    }
+                }
+
+                var debug = "me";
                 /*
                 var serializer = new XmlSerializer(typeof(List<Setting>), new XmlRootAttribute("Settings"));
                 var stringReader = new StringReader(File.ReadAllText(settingsFile));

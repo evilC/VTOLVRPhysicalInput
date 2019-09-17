@@ -9,10 +9,13 @@ namespace VTOLVRPhysicalInput
     public class Mappings
     {
         [XmlElement("StickMappings")]
-        public List<StickMappings> StickMappings = new List<StickMappings>();
+        public List<StickMappingList> MappingsList = new List<StickMappingList>();
+
+        [XmlIgnore]
+        public Dictionary<string, StickMappings> Sticks = new Dictionary<string, StickMappings>();
     }
 
-    public class StickMappings
+    public class StickMappingList
     {
         public string StickName { get; set; }
         [XmlElement("AxisToVectorComponent")]
@@ -21,6 +24,13 @@ namespace VTOLVRPhysicalInput
         public List<AxisToFloatMapping> AxisToFloatMappings = new List<AxisToFloatMapping>();
         [XmlElement("ButtonToVectorComponent")]
         public List<ButtonToVectorComponent> ButtonToVectorComponentMappings = new List<ButtonToVectorComponent>();
+    }
+
+    public class StickMappings
+    {
+        public Dictionary<string, AxisToVectorComponentMapping> AxisToVectorComponentMappings = new Dictionary<string, AxisToVectorComponentMapping>();
+        public Dictionary<string, AxisToFloatMapping> AxisToFloatMappings = new Dictionary<string, AxisToFloatMapping>();
+        public Dictionary<string, ButtonToVectorComponent> ButtonToVectorComponentMappings = new Dictionary<string, ButtonToVectorComponent>();
     }
 
     public class AxisToVectorComponentMapping
@@ -40,7 +50,7 @@ namespace VTOLVRPhysicalInput
 
     public class ButtonToVectorComponent
     {
-        public string InputButton { get; set; }
+        public int InputButton { get; set; }
         public string OutputDevice { get; set; }
         public string OutputComponent { get; set; }
         public float Direction { get; set; }
