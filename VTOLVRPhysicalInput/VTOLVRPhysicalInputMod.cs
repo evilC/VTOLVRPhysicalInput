@@ -129,11 +129,19 @@ namespace VTOLVRPhysicalInput
                         if (mappedStick.AxisToVectorComponentMappings.TryGetValue(state.Offset, out var vectorComponentMapping))
                         {
                             Log(($"AxisToVector: Axis={state.Offset}, Value={state.Value}, OutputDevice={vectorComponentMapping.OutputDevice}, Component={vectorComponentMapping.OutputComponent}"));
+                            if (vectorComponentMapping.OutputDevice == "Stick")
+                            {
+                                _vrJoystickValues[vectorComponentMapping.OutputComponent] = ConvertAxisValue(state.Value, vectorComponentMapping.Invert);
+                            }
                         }
 
                         if (mappedStick.AxisToFloatMappings.TryGetValue(state.Offset, out var floatMapping))
                         {
                             Log(($"AxisToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={floatMapping.OutputDevice}"));
+                            if (floatMapping.OutputDevice == "Throttle")
+                            {
+                                _vrThrottleValue = ConvertAxisValue(state.Value, floatMapping.Invert);
+                            }
                         }
                     }
                     else if (ov <= 44)
@@ -146,6 +154,10 @@ namespace VTOLVRPhysicalInput
                         if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonMapping))
                         {
                             Log(($"ButtonToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={buttonMapping.OutputDevice}, Component={buttonMapping.OutputComponent}"));
+                            if (buttonMapping.OutputDevice == "Throttle")
+                            {
+                                _vrThrottleThumb[buttonMapping.OutputComponent] = state.Value == 128 ? buttonMapping.Direction : 0;
+                            }
                         }
                     }
                 }
