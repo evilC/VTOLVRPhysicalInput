@@ -22,6 +22,7 @@ namespace VTOLVRPhysicalInput
         private bool _pollingEnabled;
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>() {{"PitchAxis", 0}, {"RollAxis", 0}, {"YawAxis", 0}};
         private readonly Dictionary<string, float> _vrThrottleValues = new Dictionary<string, float>() {{"ThrottleAxis", 0}};
+        private Vector3 _vrThrottleThumb = new Vector3(0, 0,0);
         private readonly List<string> _polledStickNames = new List<string>();
         private readonly List<Joystick> _polledSticks = new List<Joystick>();
         private readonly Dictionary<string, List<StickMapping>> _stickMappings = new Dictionary<string, List<StickMapping>>();
@@ -95,6 +96,7 @@ namespace VTOLVRPhysicalInput
             {
                 _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["PitchAxis"], _vrJoystickValues["YawAxis"], _vrJoystickValues["RollAxis"]));
                 _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValues["ThrottleAxis"]);
+                _vrThrottle.OnSetThumbstick.Invoke(_vrThrottleThumb);
             }
         }
 
@@ -122,6 +124,31 @@ namespace VTOLVRPhysicalInput
                                 _vrThrottleValues[stickMapping.OutputAxis] = value;
                             }
                             break;
+                        }
+                    }
+                    if (state.Offset == JoystickOffset.Buttons6)
+                    {
+                        Log($"B7: {state.Value}");
+                        if (state.Value == 128)
+                        {
+                            _vrThrottleThumb.y = 1;
+                        }
+                        else
+                        {
+                            _vrThrottleThumb.y = 0;
+                        }
+                        
+                    }
+                    else if (state.Offset == JoystickOffset.Buttons8)
+                    {
+                        Log($"B9: {state.Value}");
+                        if (state.Value == 128)
+                        {
+                            _vrThrottleThumb.y = -1;
+                        }
+                        else
+                        {
+                            _vrThrottleThumb.y = 0;
                         }
                     }
                 }
