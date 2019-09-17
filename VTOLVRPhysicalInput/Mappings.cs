@@ -49,7 +49,7 @@ namespace VTOLVRPhysicalInput
     {
         public string InputAxis { get; set; }
         public bool Invert { get; set; }
-        public string OutputDevice { get; set; }
+        public string OutputDevice { get; set; } // ToDo: Make enum
         public string OutputComponent { get; set; }
     }
 
