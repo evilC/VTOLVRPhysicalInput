@@ -15,18 +15,27 @@ namespace VTOLVRPhysicalInput
     public class StickMappings
     {
         public string StickName { get; set; }
-        [XmlElement("AxisToAxis")]
-        public List<AxisToAxisMapping> AxisToAxisMappings = new List<AxisToAxisMapping>();
+        [XmlElement("AxisToVectorComponent")]
+        public List<AxisToVectorComponentMapping> AxisToVectorComponentMappings = new List<AxisToVectorComponentMapping>();
+        [XmlElement("AxisToFloat")]
+        public List<AxisToFloatMapping> AxisToFloatMappings = new List<AxisToFloatMapping>();
         [XmlElement("ButtonToButton")]
         public List<ButtonToButtonMapping> ButtonToButtonMappings = new List<ButtonToButtonMapping>();
     }
 
-    public class AxisToAxisMapping
+    public class AxisToVectorComponentMapping
     {
         public string InputAxis { get; set; }
         public bool Invert { get; set; }
         public string OutputDevice { get; set; }
-        public string OutputAxis { get; set; }
+        public string OutputComponent { get; set; }
+    }
+
+    public class AxisToFloatMapping
+    {
+        public string InputAxis { get; set; }
+        public bool Invert { get; set; }
+        public string OutputDevice { get; set; }
     }
 
     public class ButtonToButtonMapping
