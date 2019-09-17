@@ -58,11 +58,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Setting.cs" />
-    <Compile Include="StickMapping.cs" />
+    <Compile Include="Mappings.cs" />
     <Compile Include="VTOLVRPhysicalInputMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XmlObjects.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
