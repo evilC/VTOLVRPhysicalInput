@@ -148,16 +148,36 @@ namespace VTOLVRPhysicalInput
                                     // Up
                                     output["Y"] = 1;
                                     break;
+                                case 4500:
+                                    // Up Right
+                                    output["Y"] = 1;
+                                    output["X"] = 1;
+                                    break;
                                 case 9000:
                                     // Right
                                     output["X"] = 1;
+                                    break;
+                                case 13500:
+                                    // Down Right
+                                    output["X"] = 1;
+                                    output["Y"] = -1;
                                     break;
                                 case 18000:
                                     // Down
                                     output["Y"] = -1;
                                     break;
+                                case 22500:
+                                    //Down Left
+                                    output["Y"] = -1;
+                                    output["X"] = -1;
+                                    break;
                                 case 27000:
                                     // Left
+                                    output["X"] = -1;
+                                    break;
+                                case 31500:
+                                    // Up Left
+                                    output["Y"] = 1;
                                     output["X"] = -1;
                                     break;
                             }
