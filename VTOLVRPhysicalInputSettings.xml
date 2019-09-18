@@ -14,12 +14,16 @@
       <OutputDevice>Stick</OutputDevice>
       <OutputComponent>X</OutputComponent>
     </AxisToVectorComponent>
-    <ButtonToFloat>
+    <ButtonToButton>
       <InputButton>1</InputButton>
       <OutputDevice>Stick</OutputDevice>
-      <PressValue>1</PressValue>
-      <ReleaseValue>0</ReleaseValue>
-    </ButtonToFloat>
+      <OutputButton>Trigger</OutputButton>
+    </ButtonToButton>
+    <ButtonToButton>
+      <InputButton>2</InputButton>
+      <OutputDevice>Stick</OutputDevice>
+      <OutputButton>Menu</OutputButton>
+    </ButtonToButton>
     <PovToTouchpad>
       <InputPov>1</InputPov>
       <OutputDevice>Stick</OutputDevice>

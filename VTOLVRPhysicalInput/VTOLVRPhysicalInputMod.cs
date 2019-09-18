@@ -20,11 +20,14 @@ namespace VTOLVRPhysicalInput
 
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) {{"X", 0}, {"Y", 0}, {"Z", 0}};
         private readonly Dictionary<string, float> _vrJoystickThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
+        private readonly Dictionary<string, bool> _vrJoystickButtonStates = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) {{"Trigger", false}, {"Menu", false}};
         private float _vrJoystickTriggerValue;
 
         private float _vrThrottleValue = 0;
         private readonly Dictionary<string, float> _vrThrottleThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
+        private readonly Dictionary<string, bool> _vrThrottleButtonStates = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) { { "Trigger", false }, { "Menu", false } };
         private float _vrThrottleTriggerValue;
+
         private readonly MappingsDictionary _stickMappings = new MappingsDictionary();
 
         public void Start()
@@ -97,10 +100,42 @@ namespace VTOLVRPhysicalInput
             _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
             _vrJoystick.OnTriggerAxis.Invoke(_vrJoystickTriggerValue);
             _vrJoystick.OnSetThumbstick.Invoke(new Vector3(_vrJoystickThumb["X"], _vrJoystickThumb["Y"], _vrJoystickThumb["Z"]));
+            if (_vrJoystickButtonStates["Trigger"])
+            {
+                _vrJoystick.OnTriggerDown.Invoke();
+            }
+            else
+            {
+                _vrJoystick.OnTriggerUp.Invoke();
+            }
+            if (_vrJoystickButtonStates["Menu"])
+            {
+                _vrJoystick.OnMenuButtonDown.Invoke();
+            }
+            else
+            {
+                _vrJoystick.OnMenuButtonUp.Invoke();
+            }
 
             _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValue);
             _vrThrottle.OnSetThumbstick.Invoke(new Vector3(_vrThrottleThumb["X"], _vrThrottleThumb["Y"], _vrThrottleThumb["Z"]));
             _vrThrottle.OnTriggerAxis.Invoke(_vrThrottleTriggerValue);
+            if (_vrThrottleButtonStates["Trigger"])
+            {
+                _vrThrottle.OnTriggerDown.Invoke();
+            }
+            else
+            {
+                _vrThrottle.OnTriggerUp.Invoke();
+            }
+            if (_vrThrottleButtonStates["Menu"])
+            {
+                _vrThrottle.OnMenuButtonDown.Invoke();
+            }
+            else
+            {
+                _vrThrottle.OnMenuButtonUp.Invoke();
+            }
         }
 
         public void PollSticks()
@@ -186,18 +221,26 @@ namespace VTOLVRPhysicalInput
                     else if (ov <= 175)
                     {
                         // Buttons
-                        if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonMapping))
+                        if (mappedStick.ButtonToButtonMappings.TryGetValue(state.Offset, out var buttonToButtonMapping))
                         {
-                            Log(($"ButtonToVector: Axis={state.Offset}, Value={state.Value}, OutputDevice={buttonMapping.OutputDevice}, Component={buttonMapping.OutputComponent}"));
-                            if (buttonMapping.OutputDevice == "Throttle")
+                            Log(($"ButtonToButton: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToButtonMapping.OutputDevice}, OutputButton={buttonToButtonMapping.OutputButton}"));
+                            Dictionary<string, bool> output;
+                            output = buttonToButtonMapping.OutputDevice == "Stick" ? _vrJoystickButtonStates : _vrThrottleButtonStates;
+                            output[buttonToButtonMapping.OutputButton] = state.Value == 128;
+                        }
+
+                        if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonToVectorMapping))
+                        {
+                            Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));
+                            if (buttonToVectorMapping.OutputDevice == "Throttle")
                             {
-                                _vrThrottleThumb[buttonMapping.OutputComponent] = state.Value == 128 ? buttonMapping.Direction : 0;
+                                _vrThrottleThumb[buttonToVectorMapping.OutputComponent] = state.Value == 128 ? buttonToVectorMapping.Direction : 0;
                             }
                         }
 
                         if (mappedStick.ButtonToFloatMappings.TryGetValue(state.Offset, out var buttonToFloatMapping))
                         {
-                            Log(($"ButtonToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={buttonToFloatMapping.OutputDevice}"));
+                            Log(($"ButtonToFloat: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToFloatMapping.OutputDevice}"));
                             if (buttonToFloatMapping.OutputDevice == "Stick")
                             {
                                 _vrJoystickTriggerValue = state.Value == 128 ? buttonToFloatMapping.PressValue : buttonToFloatMapping.ReleaseValue;
@@ -300,6 +343,11 @@ namespace VTOLVRPhysicalInput
                     foreach (var buttonToVectorComponentMapping in stick.ButtonToVectorComponentMappings)
                     {
                         mapping.ButtonToVectorComponentMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToVectorComponentMapping.InputButton)), buttonToVectorComponentMapping);
+                    }
+
+                    foreach (var buttonToButtonMapping in stick.ButtonToButtonMappings)
+                    {
+                        mapping.ButtonToButtonMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToButtonMapping.InputButton)), buttonToButtonMapping);
                     }
 
                     foreach (var buttonToFloatMapping in stick.ButtonToFloatMappings)
