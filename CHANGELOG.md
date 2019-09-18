@@ -10,6 +10,7 @@ Full = Map to full (-1..1) range
 High = Map to high (0..1) range  
 Low = Map to low (-1..0) range
 ### Changed
+- Previous button states checked to stop repeated spamming of button down / up events
 ### Deprecated
 ### Removed
 ### Fixed

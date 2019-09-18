@@ -23,11 +23,13 @@ namespace VTOLVRPhysicalInput
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) {{"X", 0}, {"Y", 0}, {"Z", 0}};
         private readonly Dictionary<string, float> _vrJoystickThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
         private readonly Dictionary<string, bool> _vrJoystickButtonStates = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) {{"Trigger", false}, {"Menu", false}};
+        private Dictionary<string, bool> _vrJoystickPreviousButtonStates = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) {{"Trigger", false}, {"Menu", false}};
         private float _vrJoystickTriggerValue;
 
         private float _vrThrottleValue = 0;
         private readonly Dictionary<string, float> _vrThrottleThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
         private readonly Dictionary<string, bool> _vrThrottleButtonStates = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) { { "Trigger", false }, { "Menu", false } };
+        private Dictionary<string, bool> _vrThrottlePreviousButtonStates = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) { { "Trigger", false }, { "Menu", false } };
         private float _vrThrottleTriggerValue;
 
         private readonly MappingsDictionary _stickMappings = new MappingsDictionary();
@@ -108,22 +110,25 @@ namespace VTOLVRPhysicalInput
                 _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
                 _vrJoystick.OnTriggerAxis.Invoke(_vrJoystickTriggerValue);
                 _vrJoystick.OnSetThumbstick.Invoke(new Vector3(_vrJoystickThumb["X"], _vrJoystickThumb["Y"], _vrJoystickThumb["Z"]));
-                if (_vrJoystickButtonStates["Trigger"])
+                if (_vrJoystickButtonStates["Trigger"] && !_vrJoystickPreviousButtonStates["Trigger"])
                 {
                     _vrJoystick.OnTriggerDown.Invoke();
                 }
-                else
+                else if (!_vrJoystickButtonStates["Trigger"] && _vrJoystickPreviousButtonStates["Trigger"])
                 {
                     _vrJoystick.OnTriggerUp.Invoke();
                 }
-                if (_vrJoystickButtonStates["Menu"])
+
+                if (_vrJoystickButtonStates["Menu"] && !_vrJoystickPreviousButtonStates["Menu"])
                 {
                     _vrJoystick.OnMenuButtonDown.Invoke();
                 }
-                else
+                else if (!_vrJoystickButtonStates["Menu"] && _vrJoystickPreviousButtonStates["Menu"])
                 {
                     _vrJoystick.OnMenuButtonUp.Invoke();
                 }
+
+                _vrJoystickPreviousButtonStates = _vrJoystickButtonStates;
             }
 
             if (_deviceMapped["Throttle"])
@@ -131,22 +136,24 @@ namespace VTOLVRPhysicalInput
                 _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValue);
                 _vrThrottle.OnSetThumbstick.Invoke(new Vector3(_vrThrottleThumb["X"], _vrThrottleThumb["Y"], _vrThrottleThumb["Z"]));
                 _vrThrottle.OnTriggerAxis.Invoke(_vrThrottleTriggerValue);
-                if (_vrThrottleButtonStates["Trigger"])
+                if (_vrThrottleButtonStates["Trigger"] && !_vrThrottlePreviousButtonStates["Trigger"])
                 {
                     _vrThrottle.OnTriggerDown.Invoke();
                 }
-                else
+                else if (!_vrThrottleButtonStates["Trigger"] && _vrThrottlePreviousButtonStates["Trigger"])
                 {
                     _vrThrottle.OnTriggerUp.Invoke();
                 }
-                if (_vrThrottleButtonStates["Menu"])
+                if (_vrThrottleButtonStates["Menu"] && !_vrThrottlePreviousButtonStates["Menu"])
                 {
                     _vrThrottle.OnMenuButtonDown.Invoke();
                 }
-                else
+                else if (!_vrThrottleButtonStates["Menu"] && _vrThrottlePreviousButtonStates["Menu"])
                 {
                     _vrThrottle.OnMenuButtonUp.Invoke();
                 }
+
+                _vrThrottlePreviousButtonStates = _vrThrottleButtonStates;
             }
         }
 
