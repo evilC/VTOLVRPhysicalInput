@@ -172,11 +172,13 @@ namespace VTOLVRPhysicalInput
 
                         if (mappedStick.AxisToFloatMappings.TryGetValue(state.Offset, out var floatMapping))
                         {
-                            Log(($"AxisToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={floatMapping.OutputDevice}"));
                             if (floatMapping.OutputDevice == "Throttle")
                             {
-                                _vrThrottleValue = ConvertAxisValue(state.Value, floatMapping.Invert);
+                                var outputValue = ConvertAxisValue(state.Value, floatMapping.Invert, floatMapping.MappingRange);
+                                _vrThrottleValue = outputValue;
+                                Log(($"AxisToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={floatMapping.OutputDevice}, OutputValue: {outputValue}"));
                             }
+                            
                         }
                     }
                     else if (ov <= 44)
@@ -283,12 +285,22 @@ namespace VTOLVRPhysicalInput
             Log("Got VRJoystick");
         }
 
-        private static float ConvertAxisValue(int value, bool invert)
+        private static float ConvertAxisValue(int value, bool invert, string mappingRange = "Full")
         {
             float retVal;
             if (value == 65535) retVal = 1;
             else retVal = (((float)value / 32767) - 1);
             if (invert) retVal *= -1;
+            if (mappingRange == "High")
+            {
+                retVal /= 2;
+                retVal += 0.5f;
+            }
+            else if (mappingRange == "Low")
+            {
+                retVal /= 2;
+                retVal -= 0.5f;
+            }
             return retVal;
         }
 

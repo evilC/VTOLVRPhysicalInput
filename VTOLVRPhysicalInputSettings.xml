@@ -42,6 +42,7 @@
       <InputAxis>Z</InputAxis>
       <Invert>true</Invert>
       <OutputDevice>Throttle</OutputDevice>
+      <MappingRange>High</MappingRange>
     </AxisToFloat>
     <ButtonToVectorComponent>
       <InputButton>7</InputButton>

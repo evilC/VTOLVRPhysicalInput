@@ -67,6 +67,7 @@ namespace VTOLVRPhysicalInput
         public string InputAxis { get; set; }
         public bool Invert { get; set; }
         public string OutputDevice { get; set; }
+        public string MappingRange { get; set; }
     }
 
     public class ButtonToVectorComponent
