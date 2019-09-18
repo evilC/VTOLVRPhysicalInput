@@ -52,7 +52,7 @@
       <Direction>-1</Direction>
     </ButtonToVectorComponent>
     <ButtonToFloat>
-      <InputButton>1</InputButton>
+      <InputButton>2</InputButton>
       <OutputDevice>Throttle</OutputDevice>
       <PressValue>1</PressValue>
       <ReleaseValue>0</ReleaseValue>
