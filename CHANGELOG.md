@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Removed
 ### Fixed
 
+## [0.0.2] - 2019-09-15
+### Added
+- Mapping of the Throttle is now supported
+- All controls on the Stick and Throttle should be mappable
+
 ## [0.0.1] - 2019-09-15
 ### Added
 - Initial Release
