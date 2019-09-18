@@ -18,6 +18,8 @@ namespace VTOLVRPhysicalInput
         private bool _waitingForVrJoystick;
         private bool _pollingEnabled;
 
+        private Dictionary<string, bool> _deviceMapped = new Dictionary<string, bool>(){{"Stick", false}, {"Throttle", false}};
+
         private readonly Dictionary<string, float> _vrJoystickValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) {{"X", 0}, {"Y", 0}, {"Z", 0}};
         private readonly Dictionary<string, float> _vrJoystickThumb = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase) { { "X", 0 }, { "Y", 0 }, { "Z", 0 } };
         private readonly Dictionary<string, bool> _vrJoystickButtonStates = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) {{"Trigger", false}, {"Menu", false}};
@@ -65,6 +67,10 @@ namespace VTOLVRPhysicalInput
                 polledStick.Value.Stick.Acquire();
             }
 
+            foreach (var device in _deviceMapped)
+            {
+                Log($"Output Device {device.Key} mapped = {device.Value}");
+            }
         }
 
         public void Update()
@@ -97,44 +103,50 @@ namespace VTOLVRPhysicalInput
 
             if (!VrControlsAvailable()) return;
 
-            _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
-            _vrJoystick.OnTriggerAxis.Invoke(_vrJoystickTriggerValue);
-            _vrJoystick.OnSetThumbstick.Invoke(new Vector3(_vrJoystickThumb["X"], _vrJoystickThumb["Y"], _vrJoystickThumb["Z"]));
-            if (_vrJoystickButtonStates["Trigger"])
+            if (_deviceMapped["Stick"])
             {
-                _vrJoystick.OnTriggerDown.Invoke();
-            }
-            else
-            {
-                _vrJoystick.OnTriggerUp.Invoke();
-            }
-            if (_vrJoystickButtonStates["Menu"])
-            {
-                _vrJoystick.OnMenuButtonDown.Invoke();
-            }
-            else
-            {
-                _vrJoystick.OnMenuButtonUp.Invoke();
+                _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
+                _vrJoystick.OnTriggerAxis.Invoke(_vrJoystickTriggerValue);
+                _vrJoystick.OnSetThumbstick.Invoke(new Vector3(_vrJoystickThumb["X"], _vrJoystickThumb["Y"], _vrJoystickThumb["Z"]));
+                if (_vrJoystickButtonStates["Trigger"])
+                {
+                    _vrJoystick.OnTriggerDown.Invoke();
+                }
+                else
+                {
+                    _vrJoystick.OnTriggerUp.Invoke();
+                }
+                if (_vrJoystickButtonStates["Menu"])
+                {
+                    _vrJoystick.OnMenuButtonDown.Invoke();
+                }
+                else
+                {
+                    _vrJoystick.OnMenuButtonUp.Invoke();
+                }
             }
 
-            _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValue);
-            _vrThrottle.OnSetThumbstick.Invoke(new Vector3(_vrThrottleThumb["X"], _vrThrottleThumb["Y"], _vrThrottleThumb["Z"]));
-            _vrThrottle.OnTriggerAxis.Invoke(_vrThrottleTriggerValue);
-            if (_vrThrottleButtonStates["Trigger"])
+            if (_deviceMapped["Throttle"])
             {
-                _vrThrottle.OnTriggerDown.Invoke();
-            }
-            else
-            {
-                _vrThrottle.OnTriggerUp.Invoke();
-            }
-            if (_vrThrottleButtonStates["Menu"])
-            {
-                _vrThrottle.OnMenuButtonDown.Invoke();
-            }
-            else
-            {
-                _vrThrottle.OnMenuButtonUp.Invoke();
+                _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValue);
+                _vrThrottle.OnSetThumbstick.Invoke(new Vector3(_vrThrottleThumb["X"], _vrThrottleThumb["Y"], _vrThrottleThumb["Z"]));
+                _vrThrottle.OnTriggerAxis.Invoke(_vrThrottleTriggerValue);
+                if (_vrThrottleButtonStates["Trigger"])
+                {
+                    _vrThrottle.OnTriggerDown.Invoke();
+                }
+                else
+                {
+                    _vrThrottle.OnTriggerUp.Invoke();
+                }
+                if (_vrThrottleButtonStates["Menu"])
+                {
+                    _vrThrottle.OnMenuButtonDown.Invoke();
+                }
+                else
+                {
+                    _vrThrottle.OnMenuButtonUp.Invoke();
+                }
             }
         }
 
@@ -330,34 +342,41 @@ namespace VTOLVRPhysicalInput
                     }
 
                     var mapping = _stickMappings.Sticks[stick.StickName];
+
                     foreach (var axisToVectorComponentMapping in stick.AxisToVectorComponentMappings)
                     {
                         mapping.AxisToVectorComponentMappings.Add(JoystickOffsetFromName(axisToVectorComponentMapping.InputAxis), axisToVectorComponentMapping);
+                        _deviceMapped[axisToVectorComponentMapping.OutputDevice] = true;
                     }
 
                     foreach (var axisToFloatMapping in stick.AxisToFloatMappings)
                     {
                         mapping.AxisToFloatMappings.Add(JoystickOffsetFromName(axisToFloatMapping.InputAxis), axisToFloatMapping);
+                        _deviceMapped[axisToFloatMapping.OutputDevice] = true;
                     }
 
                     foreach (var buttonToVectorComponentMapping in stick.ButtonToVectorComponentMappings)
                     {
                         mapping.ButtonToVectorComponentMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToVectorComponentMapping.InputButton)), buttonToVectorComponentMapping);
+                        _deviceMapped[buttonToVectorComponentMapping.OutputDevice] = true;
                     }
 
                     foreach (var buttonToButtonMapping in stick.ButtonToButtonMappings)
                     {
                         mapping.ButtonToButtonMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToButtonMapping.InputButton)), buttonToButtonMapping);
+                        _deviceMapped[buttonToButtonMapping.OutputDevice] = true;
                     }
 
                     foreach (var buttonToFloatMapping in stick.ButtonToFloatMappings)
                     {
                         mapping.ButtonToFloatMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToFloatMapping.InputButton)), buttonToFloatMapping);
+                        _deviceMapped[buttonToFloatMapping.OutputDevice] = true;
                     }
 
                     foreach (var povToTouchpadMapping in stick.PovToTouchpadMappings)
                     {
                         mapping.PovToTouchpadMappings.Add(JoystickOffsetFromName(PovNameFromIndex(povToTouchpadMapping.InputPov)), povToTouchpadMapping);
+                        _deviceMapped[povToTouchpadMapping.OutputDevice] = true;
                     }
                 }
             }
