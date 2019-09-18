@@ -128,7 +128,7 @@ namespace VTOLVRPhysicalInput
                     _vrJoystick.OnMenuButtonUp.Invoke();
                 }
 
-                _vrJoystickPreviousButtonStates = _vrJoystickButtonStates;
+                _vrJoystickPreviousButtonStates = new Dictionary<string, bool>(_vrJoystickButtonStates);
             }
 
             if (_deviceMapped["Throttle"])
@@ -153,7 +153,7 @@ namespace VTOLVRPhysicalInput
                     _vrThrottle.OnMenuButtonUp.Invoke();
                 }
 
-                _vrThrottlePreviousButtonStates = _vrThrottleButtonStates;
+                _vrThrottlePreviousButtonStates = new Dictionary<string, bool>(_vrThrottleButtonStates);
             }
         }
 
