@@ -11,7 +11,7 @@ Discussion: Contact me in the [VTOL VR Discord channel](https://discord.gg/WPvdZ
 1. Unzip the contents to your VTOL VR folder
 1. Open the Windows Joystick Control Panel (Click the Windows Start  button, type `Joy.cpl` and hit Enter)  
 1. Edit `VTOLVRPhysicalInputSettings.xml` in the `VTOLVR\VTOLVR_ModLoader\mods` folder as appropriate
-   There are currently no instructions on how to do so, as nobody else has expressed an interest in using it yet - feel free to contact me in the Discord channel linked above
+   There are currently no instructions on how to do so, as nobody else has expressed an interest in using it yet and it is an early POC, so I do not see the point in spending hours documenting what will likely change or never be used by anyone else - feel free to contact me in the Discord channel linked above
    The supplied example file is configured for a Thrustmaster T.16000M / TWCS combo
 1. Launch the game using the Mod Manager
 1. Enable the mod
