@@ -96,7 +96,8 @@ namespace VTOLVRPhysicalInput
 
             _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
             _vrJoystick.OnTriggerAxis.Invoke(_vrJoystickTriggerValue);
-            
+            _vrJoystick.OnSetThumbstick.Invoke(new Vector3(_vrJoystickThumb["X"], _vrJoystickThumb["Y"], _vrJoystickThumb["Z"]));
+
             _vrThrottle.OnSetThrottle.Invoke(_vrThrottleValue);
             _vrThrottle.OnSetThumbstick.Invoke(new Vector3(_vrThrottleThumb["X"], _vrThrottleThumb["Y"], _vrThrottleThumb["Z"]));
             _vrThrottle.OnTriggerAxis.Invoke(_vrThrottleTriggerValue);
@@ -145,7 +146,7 @@ namespace VTOLVRPhysicalInput
                             {
                                 case 0:
                                     // Up
-                                    output["Y"] = -1;
+                                    output["Y"] = 1;
                                     break;
                                 case 9000:
                                     // Right
@@ -153,7 +154,7 @@ namespace VTOLVRPhysicalInput
                                     break;
                                 case 18000:
                                     // Down
-                                    output["Y"] = 1;
+                                    output["Y"] = -1;
                                     break;
                                 case 27000:
                                     // Left
