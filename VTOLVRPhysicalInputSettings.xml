@@ -28,7 +28,12 @@
       <OutputDevice>Stick</OutputDevice>
       <OutputButton>Menu</OutputButton>
     </ButtonToButton>-->
+    <PovToTouchpad>
+      <InputPov>1</InputPov>
+      <OutputDevice>Stick</OutputDevice>
+    </PovToTouchpad>
   </StickMappings>
+
   <StickMappings>
     <StickName>TWCS Throttle</StickName>
     <!--Throttle Power-->

@@ -37,6 +37,19 @@ namespace VTOLVRPhysicalInput
         private OutputDevice _outputStick;
         private OutputDevice _outputThrottle;
 
+        private static Dictionary<int, Vector3> _povAngleToVector3 = new Dictionary<int, Vector3>
+        {
+            { -1, new Vector3(0, 0, 0) },       //Center 
+            { 0, new Vector3(0, 1, 0) },        // Up
+            { 4500, new Vector3(1, 1, 0) },     // Up Right
+            { 9000, new Vector3(1, 0, 0) },     // Right
+            { 13500, new Vector3(1, -1, 0) },   // Down Right
+            { 18000, new Vector3(0, -1, 0) },   // Down
+            { 22500, new Vector3(-1, -1, 0) },  // Down Left
+            { 27000, new Vector3(-1, 0, 0) },   // Left
+            { 31500, new Vector3(-1, 1, 0) }    // Up Left
+        };
+
         /// <summary>
         /// When running in game, called at start
         /// </summary>
@@ -86,14 +99,21 @@ namespace VTOLVRPhysicalInput
         {
             // Stick Output
             _outputStick = new OutputDevice();
-            _outputStick.AddAxisSet("StickXyz", new List<string> { "Roll", "Pitch", "Yaw" });
+            _outputStick
+                .AddAxisSet("StickXyz", new List<string> {"Roll", "Pitch", "Yaw"})
+                .AddAxisSet("Touchpad", new List<string> {"X", "Y", "Z"});
+
             if (standaloneTesting)
             {
-                _outputStick.AddAxisSetDelegate("StickXyz", TestingUpdateStickXyz);
+                _outputStick
+                    .AddAxisSetDelegate("StickXyz", TestingUpdateStickXyz)
+                    .AddAxisSetDelegate("Touchpad", TestingUpdateStickTocuhpad);
             }
             else
             {
-                _outputStick.AddAxisSetDelegate("StickXyz", UpdateStickXyz);
+                _outputStick
+                    .AddAxisSetDelegate("StickXyz", UpdateStickXyz)
+                    .AddAxisSetDelegate("Touchpad", UpdateStickTocuhpad);
             }
 
             // Throttle Output
@@ -124,6 +144,16 @@ namespace VTOLVRPhysicalInput
         private void TestingUpdateStickXyz(Dictionary<string, float> values)
         {
             Log($"Update StickXyz: {values.ToDebugString()}");
+        }
+
+        private void UpdateStickTocuhpad(Dictionary<string, float> values)
+        {
+            _vrJoystick.OnSetThumbstick.Invoke(new Vector3(values["X"], values["Y"], values["Z"]));
+        }
+
+        private void TestingUpdateStickTocuhpad(Dictionary<string, float> values)
+        {
+            Log($"Update StickTouchpad: {values.ToDebugString()}");
         }
 
         private void UpdateThrottlePower(Dictionary<string, float> values)
@@ -281,6 +311,21 @@ namespace VTOLVRPhysicalInput
                     else if (ov <= 44)
                     {
                         // POV Hats
+                        if (mappedStick.PovToTouchpadMappings.TryGetValue(state.Offset, out var touchpadMapping))
+                        {
+                            //Log(($"PovToTouchpad: POV={state.Offset}, Value={state.Value}, OutputDevice={touchpadMapping.OutputDevice}"));
+                            var vec = _povAngleToVector3[state.Value];
+                            if (touchpadMapping.OutputDevice == "Stick")
+                            {
+                                _outputStick.SetAxis("X", vec.x);
+                                _outputStick.SetAxis("Y", vec.y);
+                            }
+                            else if (touchpadMapping.OutputDevice == "Throttle")
+                            {
+                                _outputThrottle.SetAxis("X", vec.x);
+                                _outputThrottle.SetAxis("Y", vec.y);
+                            }
+                        }
                     }
                     else if (ov <= 175)
                     {
