@@ -34,10 +34,17 @@ namespace VTOLVRPhysicalInput
 
         private readonly MappingsDictionary _stickMappings = new MappingsDictionary();
 
+        private OutputDevice _outputStick;
+        private OutputDevice _outputThrottle;
+
+        /// <summary>
+        /// When running in game, called at start
+        /// </summary>
         public void Start()
         {
             DontDestroyOnLoad(this.gameObject); // Required, else mod stops working when you leave opening scene and enter ready room
             InitSticks();
+            InitUpdates();
         }
 
         public void InitSticks(bool standaloneTesting = false)
@@ -75,6 +82,57 @@ namespace VTOLVRPhysicalInput
             }
         }
 
+        public void InitUpdates(bool standaloneTesting = false)
+        {
+            // Stick Output
+            _outputStick = new OutputDevice();
+            _outputStick.AddAxisSet("StickXyz", new List<string> { "Roll", "Pitch", "Yaw" });
+            if (standaloneTesting)
+            {
+                _outputStick.AddAxisSetDelegate("StickXyz", TestingUpdateStickXyz);
+            }
+            else
+            {
+                _outputStick.AddAxisSetDelegate("StickXyz", UpdateStickXyz);
+            }
+
+            // Throttle Output
+            _outputThrottle = new OutputDevice();
+            _outputThrottle
+                .AddAxisSet("Throttle", new List<string> { "Throttle" });
+            if (standaloneTesting)
+            {
+                _outputThrottle.AddAxisSetDelegate("Throttle", TestingUpdateThrottlePower);
+            }
+            else
+            {
+                _outputThrottle.AddAxisSetDelegate("Throttle", UpdateThrottlePower);
+            }
+        }
+
+        private void UpdateStickXyz(Dictionary<string, float> values)
+        {
+            _vrJoystick.OnSetStick.Invoke(new Vector3(values["Pitch"], values["Yaw"], values["Roll"]));
+        }
+
+        private void TestingUpdateStickXyz(Dictionary<string, float> values)
+        {
+            Log($"Update StickXyz: {values.ToDebugString()}");
+        }
+
+        private void UpdateThrottlePower(Dictionary<string, float> values)
+        {
+            _vrThrottle.OnSetThrottle.Invoke(values["Throttle"]);
+        }
+
+        private void TestingUpdateThrottlePower(Dictionary<string, float> values)
+        {
+            Log($"Update ThrottlePower: {values.ToDebugString()}");
+        }
+
+        /// <summary>
+        /// Called by Unity each frame
+        /// </summary>
         public void Update()
         {
             if (_pollingEnabled)
@@ -105,6 +163,8 @@ namespace VTOLVRPhysicalInput
 
             if (!VrControlsAvailable()) return;
 
+            SendUpdates();
+            /*
             if (_deviceMapped["Stick"])
             {
                 _vrJoystick.OnSetStick.Invoke(new Vector3(_vrJoystickValues["X"], _vrJoystickValues["Y"], _vrJoystickValues["Z"]));
@@ -155,8 +215,30 @@ namespace VTOLVRPhysicalInput
 
                 _vrThrottlePreviousButtonStates = new Dictionary<string, bool>(_vrThrottleButtonStates);
             }
+            */
         }
 
+        /// <summary>
+        /// When playing game, called by Update when we are in the cockpit
+        /// When testing via console app, called directly
+        /// </summary>
+        public void SendUpdates()
+        {
+            if (_deviceMapped["Stick"])
+            {
+                _outputStick.SendUpdates();
+            }
+
+            if (_deviceMapped["Throttle"])
+            {
+                _outputThrottle.SendUpdates();
+            }
+        }
+
+        /// <summary>
+        /// When playing game, called by Update when we are in the cockpit
+        /// When testing via console app, called directly
+        /// </summary>
         public void PollSticks()
         {
             foreach (var mappedStick in _stickMappings.Sticks.Values)
@@ -170,7 +252,35 @@ namespace VTOLVRPhysicalInput
                         // Axes
                         if (mappedStick.AxisToVectorComponentMappings.TryGetValue(state.Offset, out var vectorComponentMapping))
                         {
-                            Log(($"AxisToVector: Axis={state.Offset}, Value={state.Value}, OutputDevice={vectorComponentMapping.OutputDevice}, Component={vectorComponentMapping.OutputComponent}"));
+                            if (vectorComponentMapping.OutputDevice == "Stick")
+                            {
+                                _outputStick.SetAxis(vectorComponentMapping.OutputComponent, ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
+                            }
+                            else
+                            {
+                                _outputThrottle.SetAxis(vectorComponentMapping.OutputComponent, ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+        public void PollSticks()
+        {
+            foreach (var mappedStick in _stickMappings.Sticks.Values)
+            {
+                var data = mappedStick.Stick.GetBufferedData();
+                foreach (var state in data)
+                {
+                    var ov = (int)state.Offset;
+                    if (ov <= 28)
+                    {
+                        // Axes
+                        if (mappedStick.AxisToVectorComponentMappings.TryGetValue(state.Offset, out var vectorComponentMapping))
+                        {
+                            //Log(($"AxisToVector: Axis={state.Offset}, Value={state.Value}, OutputDevice={vectorComponentMapping.OutputDevice}, Component={vectorComponentMapping.OutputComponent}"));
                             if (vectorComponentMapping.OutputDevice == "Stick")
                             {
                                 _vrJoystickValues[vectorComponentMapping.OutputComponent] = ConvertAxisValue(state.Value, vectorComponentMapping.Invert);
@@ -183,7 +293,7 @@ namespace VTOLVRPhysicalInput
                             {
                                 var outputValue = ConvertAxisValue(state.Value, floatMapping.Invert, floatMapping.MappingRange);
                                 _vrThrottleValue = outputValue;
-                                Log(($"AxisToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={floatMapping.OutputDevice}, OutputValue: {outputValue}"));
+                                //Log(($"AxisToFloat: Axis={state.Offset}, Value={state.Value}, OutputDevice={floatMapping.OutputDevice}, OutputValue: {outputValue}"));
                             }
                             
                         }
@@ -193,7 +303,7 @@ namespace VTOLVRPhysicalInput
                         // POV Hats
                         if (mappedStick.PovToTouchpadMappings.TryGetValue(state.Offset, out var touchpadMapping))
                         {
-                            Log(($"PovToTouchpad: POV={state.Offset}, Value={state.Value}, OutputDevice={touchpadMapping.OutputDevice}"));
+                            //Log(($"PovToTouchpad: POV={state.Offset}, Value={state.Value}, OutputDevice={touchpadMapping.OutputDevice}"));
                             var output = touchpadMapping.OutputDevice == "Stick" ? _vrJoystickThumb : _vrThrottleThumb;
                             output["X"] = 0;
                             output["Y"] = 0;
@@ -244,7 +354,7 @@ namespace VTOLVRPhysicalInput
                         // Buttons
                         if (mappedStick.ButtonToButtonMappings.TryGetValue(state.Offset, out var buttonToButtonMapping))
                         {
-                            Log(($"ButtonToButton: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToButtonMapping.OutputDevice}, OutputButton={buttonToButtonMapping.OutputButton}"));
+                            //Log(($"ButtonToButton: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToButtonMapping.OutputDevice}, OutputButton={buttonToButtonMapping.OutputButton}"));
                             Dictionary<string, bool> output;
                             output = buttonToButtonMapping.OutputDevice == "Stick" ? _vrJoystickButtonStates : _vrThrottleButtonStates;
                             output[buttonToButtonMapping.OutputButton] = state.Value == 128;
@@ -252,7 +362,7 @@ namespace VTOLVRPhysicalInput
 
                         if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonToVectorMapping))
                         {
-                            Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));
+                            //Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));
                             if (buttonToVectorMapping.OutputDevice == "Throttle")
                             {
                                 _vrThrottleThumb[buttonToVectorMapping.OutputComponent] = state.Value == 128 ? buttonToVectorMapping.Direction : 0;
@@ -261,7 +371,7 @@ namespace VTOLVRPhysicalInput
 
                         if (mappedStick.ButtonToFloatMappings.TryGetValue(state.Offset, out var buttonToFloatMapping))
                         {
-                            Log(($"ButtonToFloat: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToFloatMapping.OutputDevice}"));
+                            //Log(($"ButtonToFloat: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToFloatMapping.OutputDevice}"));
                             if (buttonToFloatMapping.OutputDevice == "Stick")
                             {
                                 _vrJoystickTriggerValue = state.Value == 128 ? buttonToFloatMapping.PressValue : buttonToFloatMapping.ReleaseValue;
@@ -275,6 +385,7 @@ namespace VTOLVRPhysicalInput
                 }
             }
         }
+        */
 
         private IEnumerator FindScripts()
         {
@@ -368,11 +479,11 @@ namespace VTOLVRPhysicalInput
                         _deviceMapped[axisToVectorComponentMapping.OutputDevice] = true;
                     }
 
-                    foreach (var axisToFloatMapping in stick.AxisToFloatMappings)
-                    {
-                        mapping.AxisToFloatMappings.Add(JoystickOffsetFromName(axisToFloatMapping.InputAxis), axisToFloatMapping);
-                        _deviceMapped[axisToFloatMapping.OutputDevice] = true;
-                    }
+                    //foreach (var axisToFloatMapping in stick.AxisToFloatMappings)
+                    //{
+                    //    mapping.AxisToFloatMappings.Add(JoystickOffsetFromName(axisToFloatMapping.InputAxis), axisToFloatMapping);
+                    //    _deviceMapped[axisToFloatMapping.OutputDevice] = true;
+                    //}
 
                     foreach (var buttonToVectorComponentMapping in stick.ButtonToVectorComponentMappings)
                     {

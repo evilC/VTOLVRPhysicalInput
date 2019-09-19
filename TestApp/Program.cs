@@ -12,9 +12,11 @@ namespace TestApp
         {
             var foo = new VTOLVRPhysicalInput.VtolVrPhysicalInput();
             foo.InitSticks(true);
+            foo.InitUpdates(true);
             while (true)
             {
                 foo.PollSticks();
+                foo.SendUpdates();
                 Thread.Sleep(200);
             }
         }

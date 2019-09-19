@@ -58,7 +58,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Mappings.cs" />
+    <Compile Include="OutputDevice.cs" />
     <Compile Include="VTOLVRPhysicalInputMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
