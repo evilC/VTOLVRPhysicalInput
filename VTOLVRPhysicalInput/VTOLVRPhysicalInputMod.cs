@@ -120,20 +120,23 @@ namespace VTOLVRPhysicalInput
             // Throttle Output
             _outputThrottle = new OutputDevice();
             _outputThrottle
-                .AddAxisSet("Throttle", new List<string> { "Throttle" })
-                .AddAxisSet("Touchpad", new List<string> { "X", "Y", "Z" });
+                .AddAxisSet("Throttle", new List<string> {"Throttle"})
+                .AddAxisSet("Touchpad", new List<string> {"X", "Y", "Z"})
+                .AddAxisSet("Trigger", new List<string> { "Trigger" });
                 
             if (standaloneTesting)
             {
                 _outputThrottle
                     .AddAxisSetDelegate("Throttle", TestingUpdateThrottlePower)
-                    .AddAxisSetDelegate("Touchpad", TestingUpdateThrottleTouchpad);
+                    .AddAxisSetDelegate("Touchpad", TestingUpdateThrottleTouchpad)
+                    .AddAxisSetDelegate("Trigger", TestingUpdateThrottleTriggerAxis);
             }
             else
             {
                 _outputThrottle
                     .AddAxisSetDelegate("Throttle", UpdateThrottlePower)
-                    .AddAxisSetDelegate("Touchpad", UpdateThrottleTouchpad);
+                    .AddAxisSetDelegate("Touchpad", UpdateThrottleTouchpad)
+                    .AddAxisSetDelegate("Trigger", UpdateThrottleTriggerAxis);
             }
 
             _outputDevices = new Dictionary<string, OutputDevice> {{"Stick", _outputStick}, { "Throttle", _outputThrottle} };
@@ -178,6 +181,18 @@ namespace VTOLVRPhysicalInput
         {
             Log($"Update ThrottleTouchpad: {values.ToDebugString()}");
         }
+
+        private void UpdateThrottleTriggerAxis(Dictionary<string, float> values)
+        {
+            _vrThrottle.OnTriggerAxis.Invoke(values["Trigger"]);
+        }
+
+        private void TestingUpdateThrottleTriggerAxis(Dictionary<string, float> values)
+        {
+            Log($"Update ThrottleTriggerAxis: {values.ToDebugString()}");
+        }
+
+
 
         /// <summary>
         /// Called by Unity each frame
@@ -330,7 +345,7 @@ namespace VTOLVRPhysicalInput
                             device.SetAxis(
                                 buttonToVectorMapping.OutputComponent, 
                                 buttonToVectorMapping.OutputSet,
-                                state.Value == 128 ? buttonToVectorMapping.Direction : 0);
+                                state.Value == 128 ? buttonToVectorMapping.PressValue : buttonToVectorMapping.ReleaseValue);
                         }
 
                     }
@@ -437,7 +452,7 @@ namespace VTOLVRPhysicalInput
                             //Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));
                             if (buttonToVectorMapping.OutputDevice == "Throttle")
                             {
-                                _vrThrottleThumb[buttonToVectorMapping.OutputComponent] = state.Value == 128 ? buttonToVectorMapping.Direction : 0;
+                                _vrThrottleThumb[buttonToVectorMapping.OutputComponent] = state.Value == 128 ? buttonToVectorMapping.PressValue : 0;
                             }
                         }
 
@@ -569,11 +584,11 @@ namespace VTOLVRPhysicalInput
                         _deviceMapped[buttonToButtonMapping.OutputDevice] = true;
                     }
 
-                    foreach (var buttonToFloatMapping in stick.ButtonToFloatMappings)
-                    {
-                        mapping.ButtonToFloatMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToFloatMapping.InputButton)), buttonToFloatMapping);
-                        _deviceMapped[buttonToFloatMapping.OutputDevice] = true;
-                    }
+                    //foreach (var buttonToFloatMapping in stick.ButtonToFloatMappings)
+                    //{
+                    //    mapping.ButtonToFloatMappings.Add(JoystickOffsetFromName(ButtonNameFromIndex(buttonToFloatMapping.InputButton)), buttonToFloatMapping);
+                    //    _deviceMapped[buttonToFloatMapping.OutputDevice] = true;
+                    //}
 
                     foreach (var povToTouchpadMapping in stick.PovToTouchpadMappings)
                     {

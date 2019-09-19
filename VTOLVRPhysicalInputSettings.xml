@@ -63,14 +63,25 @@
       <OutputDevice>Throttle</OutputDevice>
       <OutputSet>Touchpad</OutputSet>
       <OutputComponent>Y</OutputComponent>
-      <Direction>1</Direction>
+      <PressValue>1</PressValue>
+      <ReleaseValue>0</ReleaseValue>
     </ButtonToVectorComponent>
     <ButtonToVectorComponent>
       <InputButton>9</InputButton>
       <OutputDevice>Throttle</OutputDevice>
       <OutputSet>Touchpad</OutputSet>
       <OutputComponent>Y</OutputComponent>
-      <Direction>-1</Direction>
+      <PressValue>-1</PressValue>
+      <ReleaseValue>0</ReleaseValue>
+    </ButtonToVectorComponent>
+    <!--Brake-->
+    <ButtonToVectorComponent>
+      <InputButton>2</InputButton>
+      <OutputDevice>Throttle</OutputDevice>
+      <OutputSet>Trigger</OutputSet>
+      <OutputComponent>Trigger</OutputComponent>
+      <PressValue>1</PressValue>
+      <ReleaseValue>0</ReleaseValue>
     </ButtonToVectorComponent>
 
   </StickMappings>
