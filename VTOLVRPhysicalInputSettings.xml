@@ -39,7 +39,7 @@
 
   <StickMappings>
     <StickName>TWCS Throttle</StickName>
-    <!--Throttle Power-->
+    <!--Yaw-->
     <AxisToVectorComponent>
       <InputAxis>RotationZ</InputAxis>
       <Invert>false</Invert>
@@ -48,7 +48,7 @@
       <OutputComponent>Yaw</OutputComponent>
       <MappingRange>Full</MappingRange>
     </AxisToVectorComponent>
-    <!--Yaw-->
+    <!--Throttle Power-->
     <AxisToVectorComponent>
       <InputAxis>Z</InputAxis>
       <Invert>true</Invert>
