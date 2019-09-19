@@ -102,19 +102,25 @@ namespace VTOLVRPhysicalInput
             _outputStick = new OutputDevice();
             _outputStick
                 .AddAxisSet("StickXyz", new List<string> {"Roll", "Pitch", "Yaw"})
-                .AddAxisSet("Touchpad", new List<string> {"X", "Y", "Z"});
+                .AddAxisSet("Touchpad", new List<string> {"X", "Y", "Z"})
+                .AddButton("Menu")
+                .AddButton("Trigger");
 
             if (standaloneTesting)
             {
                 _outputStick
                     .AddAxisSetDelegate("StickXyz", TestingUpdateStickXyz)
-                    .AddAxisSetDelegate("Touchpad", TestingUpdateStickTouchpad);
+                    .AddAxisSetDelegate("Touchpad", TestingUpdateStickTouchpad)
+                    .AddButtonDelegate("Menu", TestingUpdateStickMenuButton)
+                    .AddButtonDelegate("Trigger", TestingUpdateStickTriggerButton);
             }
             else
             {
                 _outputStick
                     .AddAxisSetDelegate("StickXyz", UpdateStickXyz)
-                    .AddAxisSetDelegate("Touchpad", UpdateStickTouchpad);
+                    .AddAxisSetDelegate("Touchpad", UpdateStickTouchpad)
+                    .AddButtonDelegate("Menu", UpdateStickMenuButton)
+                    .AddButtonDelegate("Trigger", UpdateStickTriggerButton);
             }
 
             // Throttle Output
@@ -122,8 +128,10 @@ namespace VTOLVRPhysicalInput
             _outputThrottle
                 .AddAxisSet("Throttle", new List<string> {"Throttle"})
                 .AddAxisSet("Touchpad", new List<string> {"X", "Y", "Z"})
-                .AddAxisSet("Trigger", new List<string> { "Trigger" });
-                
+                .AddAxisSet("Trigger", new List<string> { "Trigger" })
+                .AddButton("Menu")
+                .AddButton("Trigger");
+
             if (standaloneTesting)
             {
                 _outputThrottle
@@ -142,6 +150,8 @@ namespace VTOLVRPhysicalInput
             _outputDevices = new Dictionary<string, OutputDevice> {{"Stick", _outputStick}, { "Throttle", _outputThrottle} };
         }
 
+        #region Delegates
+        #region Stick Delegates
         private void UpdateStickXyz(Dictionary<string, float> values)
         {
             _vrJoystick.OnSetStick.Invoke(new Vector3(values["Pitch"], values["Yaw"], values["Roll"]));
@@ -162,6 +172,31 @@ namespace VTOLVRPhysicalInput
             Log($"Update StickTouchpad: {values.ToDebugString()}");
         }
 
+        private void UpdateStickMenuButton(bool value)
+        {
+            if (value) _vrJoystick.OnMenuButtonDown.Invoke();
+            else _vrJoystick.OnMenuButtonUp.Invoke();
+        }
+
+        private void TestingUpdateStickMenuButton(bool value)
+        {
+            Log($"Update StickMenuButton: {value}");
+        }
+
+        private void UpdateStickTriggerButton(bool value)
+        {
+            if (value) _vrJoystick.OnTriggerDown.Invoke();
+            else _vrJoystick.OnTriggerUp.Invoke();
+        }
+
+        private void TestingUpdateStickTriggerButton(bool value)
+        {
+            Log($"Update StickTriggerButton: {value}");
+        }
+
+        #endregion
+
+        #region Throttle Delegates
         private void UpdateThrottlePower(Dictionary<string, float> values)
         {
             _vrThrottle.OnSetThrottle.Invoke(values["Throttle"]);
@@ -192,7 +227,8 @@ namespace VTOLVRPhysicalInput
             Log($"Update ThrottleTriggerAxis: {values.ToDebugString()}");
         }
 
-
+        #endregion
+        #endregion
 
         /// <summary>
         /// Called by Unity each frame
@@ -338,6 +374,13 @@ namespace VTOLVRPhysicalInput
                     else if (ov <= 175)
                     {
                         // Buttons
+                        if (mappedStick.ButtonToButtonMappings.TryGetValue(state.Offset, out var buttonToButtonMapping))
+                        {
+                            //Log(($"ButtonToButton: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToButtonMapping.OutputDevice}, OutputButton={buttonToButtonMapping.OutputButton}"));
+                            var device = _outputDevices[buttonToButtonMapping.OutputDevice];
+                            device.SetButton(buttonToButtonMapping.OutputButton, state.Value == 128);
+                        }
+
                         if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonToVectorMapping))
                         {
                             //Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));

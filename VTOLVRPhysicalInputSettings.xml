@@ -20,7 +20,7 @@
       <OutputComponent>Pitch</OutputComponent>
       <MappingRange>Full</MappingRange>
     </AxisToVectorComponent>
-    <!--<ButtonToButton>
+    <ButtonToButton>
       <InputButton>1</InputButton>
       <OutputDevice>Stick</OutputDevice>
       <OutputButton>Trigger</OutputButton>
@@ -29,7 +29,7 @@
       <InputButton>2</InputButton>
       <OutputDevice>Stick</OutputDevice>
       <OutputButton>Menu</OutputButton>
-    </ButtonToButton>-->
+    </ButtonToButton>
     <PovToTouchpad>
       <InputPov>1</InputPov>
       <OutputDevice>Stick</OutputDevice>

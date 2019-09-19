@@ -17,17 +17,27 @@ namespace VTOLVRPhysicalInput
                     = new Dictionary<string, Dictionary<string, float>>();
 
         // Has a given set changed since last update?
-        private readonly Dictionary<string, bool> _setChanged 
+        private readonly Dictionary<string, bool> _axisSetChanged 
             = new Dictionary<string, bool>();
 
-        // Functions to call on SendUpdates for each set
+        // Functions to call on SendUpdates for each set of Axes
         private readonly Dictionary</* Set Name */string, Action<Dictionary<string, float>>> _axisSetDelegates 
             = new Dictionary<string, Action<Dictionary<string, float>>>();
+
+        private readonly Dictionary<string, bool> _buttonStates
+            = new Dictionary<string, bool>();
+
+        private readonly Dictionary<string, bool> _buttonChanged
+            = new Dictionary<string, bool>();
+
+        // Functions to call on SendUpdates for each Button
+        private readonly Dictionary<string, Action<bool>> _buttonDelegates
+            = new Dictionary<string, Action<bool>>();
 
         public OutputDevice AddAxisSet(string setName, List<string> axisNames)
         {
             _axisSetStates.Add(setName, new Dictionary<string, float>());
-            _setChanged.Add(setName, false);
+            _axisSetChanged.Add(setName, false);
             foreach (var axisName in axisNames)
             {
                 _axisSetStates[setName].Add(axisName, 0);
@@ -42,11 +52,30 @@ namespace VTOLVRPhysicalInput
             return this;
         }
 
+        public OutputDevice AddButton(string name)
+        {
+            _buttonStates.Add(name, false);
+            _buttonChanged.Add(name, false);
+            return this;
+        }
+
+        public OutputDevice AddButtonDelegate(string name, Action<bool> buttonDelegate)
+        {
+            _buttonDelegates.Add(name, buttonDelegate);
+            return this;
+        }
+
         public void SetAxis(string axisName, string setName, float value)
         {
             var setStates = _axisSetStates[setName];
             setStates[axisName] = value;
-            _setChanged[setName] = true;
+            _axisSetChanged[setName] = true;
+        }
+
+        public void SetButton(string buttonName, bool value)
+        {
+            _buttonStates[buttonName] = value;
+            _buttonChanged[buttonName] = true;
         }
 
         public void SendUpdates()
@@ -54,10 +83,17 @@ namespace VTOLVRPhysicalInput
             foreach (var setDelegate in _axisSetDelegates)
             {
                 var setName = setDelegate.Key;
-                if (!_setChanged[setName]) continue;
+                if (!_axisSetChanged[setName]) continue;
                 var setStates = _axisSetStates[setName];
                 setDelegate.Value(setStates);
-                _setChanged[setName] = false;
+                _axisSetChanged[setName] = false;
+            }
+
+            foreach (var buttonDelegate in _buttonDelegates)
+            {
+                if (!_buttonChanged[buttonDelegate.Key]) continue;
+                buttonDelegate.Value(_buttonStates[buttonDelegate.Key]);
+                _buttonChanged[buttonDelegate.Key] = false;
             }
         }
 
