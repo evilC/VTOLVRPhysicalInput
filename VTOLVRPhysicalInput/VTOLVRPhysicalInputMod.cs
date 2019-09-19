@@ -99,14 +99,20 @@ namespace VTOLVRPhysicalInput
             // Throttle Output
             _outputThrottle = new OutputDevice();
             _outputThrottle
-                .AddAxisSet("Throttle", new List<string> { "Throttle" });
+                .AddAxisSet("Throttle", new List<string> { "Throttle" })
+                .AddAxisSet("Touchpad", new List<string> { "X", "Y", "Z" });
+                
             if (standaloneTesting)
             {
-                _outputThrottle.AddAxisSetDelegate("Throttle", TestingUpdateThrottlePower);
+                _outputThrottle
+                    .AddAxisSetDelegate("Throttle", TestingUpdateThrottlePower)
+                    .AddAxisSetDelegate("Touchpad", TestingUpdateThrottleTouchpad);
             }
             else
             {
-                _outputThrottle.AddAxisSetDelegate("Throttle", UpdateThrottlePower);
+                _outputThrottle
+                    .AddAxisSetDelegate("Throttle", UpdateThrottlePower)
+                    .AddAxisSetDelegate("Touchpad", UpdateThrottleTouchpad);
             }
         }
 
@@ -128,6 +134,16 @@ namespace VTOLVRPhysicalInput
         private void TestingUpdateThrottlePower(Dictionary<string, float> values)
         {
             Log($"Update ThrottlePower: {values.ToDebugString()}");
+        }
+
+        private void UpdateThrottleTouchpad(Dictionary<string, float> values)
+        {
+            _vrThrottle.OnSetThumbstick.Invoke(new Vector3(values["X"], values["Y"], values["Z"]));
+        }
+
+        private void TestingUpdateThrottleTouchpad(Dictionary<string, float> values)
+        {
+            Log($"Update ThrottleTouchpad: {values.ToDebugString()}");
         }
 
         /// <summary>
@@ -261,6 +277,23 @@ namespace VTOLVRPhysicalInput
                                 _outputThrottle.SetAxis(vectorComponentMapping.OutputComponent, ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
                             }
                         }
+                    }
+                    else if (ov <= 44)
+                    {
+                        // POV Hats
+                    }
+                    else if (ov <= 175)
+                    {
+                        // Buttons
+                        if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonToVectorMapping))
+                        {
+                            //Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));
+                            if (buttonToVectorMapping.OutputDevice == "Throttle")
+                            {
+                                _outputThrottle.SetAxis(buttonToVectorMapping.OutputComponent, state.Value == 128 ? buttonToVectorMapping.Direction : 0);
+                            }
+                        }
+
                     }
                 }
             }
