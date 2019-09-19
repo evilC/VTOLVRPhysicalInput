@@ -20,10 +20,6 @@ namespace VTOLVRPhysicalInput
         private readonly Dictionary<string, bool> _setChanged 
             = new Dictionary<string, bool>();
 
-        // Which Set each axis is in
-        private readonly Dictionary<string, string> _axisToSetMappings
-            = new Dictionary<string, string>();
-
         // Functions to call on SendUpdates for each set
         private readonly Dictionary</* Set Name */string, Action<Dictionary<string, float>>> _axisSetDelegates 
             = new Dictionary<string, Action<Dictionary<string, float>>>();
@@ -35,7 +31,6 @@ namespace VTOLVRPhysicalInput
             foreach (var axisName in axisNames)
             {
                 _axisSetStates[setName].Add(axisName, 0);
-                _axisToSetMappings.Add(axisName, setName);
             }
 
             return this;
@@ -47,9 +42,8 @@ namespace VTOLVRPhysicalInput
             return this;
         }
 
-        public void SetAxis(string axisName, float value)
+        public void SetAxis(string axisName, string setName, float value)
         {
-            var setName = _axisToSetMappings[axisName];
             var setStates = _axisSetStates[setName];
             setStates[axisName] = value;
             _setChanged[setName] = true;

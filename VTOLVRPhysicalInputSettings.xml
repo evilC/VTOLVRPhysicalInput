@@ -7,6 +7,7 @@
       <InputAxis>X</InputAxis>
       <Invert>true</Invert>
       <OutputDevice>Stick</OutputDevice>
+      <OutputSet>StickXyz</OutputSet>
       <OutputComponent>Roll</OutputComponent>
       <MappingRange>Full</MappingRange>
     </AxisToVectorComponent>
@@ -15,6 +16,7 @@
       <InputAxis>Y</InputAxis>
       <Invert>true</Invert>
       <OutputDevice>Stick</OutputDevice>
+      <OutputSet>StickXyz</OutputSet>
       <OutputComponent>Pitch</OutputComponent>
       <MappingRange>Full</MappingRange>
     </AxisToVectorComponent>
@@ -31,6 +33,7 @@
     <PovToTouchpad>
       <InputPov>1</InputPov>
       <OutputDevice>Stick</OutputDevice>
+      <OutputSet>Touchpad</OutputSet>
     </PovToTouchpad>
   </StickMappings>
 
@@ -41,6 +44,7 @@
       <InputAxis>RotationZ</InputAxis>
       <Invert>false</Invert>
       <OutputDevice>Stick</OutputDevice>
+      <OutputSet>StickXyz</OutputSet>
       <OutputComponent>Yaw</OutputComponent>
       <MappingRange>Full</MappingRange>
     </AxisToVectorComponent>
@@ -49,6 +53,7 @@
       <InputAxis>Z</InputAxis>
       <Invert>true</Invert>
       <OutputDevice>Throttle</OutputDevice>
+      <OutputSet>Throttle</OutputSet>
       <OutputComponent>Throttle</OutputComponent>
       <MappingRange>High</MappingRange>
     </AxisToVectorComponent>
@@ -56,12 +61,14 @@
     <ButtonToVectorComponent>
       <InputButton>7</InputButton>
       <OutputDevice>Throttle</OutputDevice>
+      <OutputSet>Touchpad</OutputSet>
       <OutputComponent>Y</OutputComponent>
       <Direction>1</Direction>
     </ButtonToVectorComponent>
     <ButtonToVectorComponent>
       <InputButton>9</InputButton>
       <OutputDevice>Throttle</OutputDevice>
+      <OutputSet>Touchpad</OutputSet>
       <OutputComponent>Y</OutputComponent>
       <Direction>-1</Direction>
     </ButtonToVectorComponent>

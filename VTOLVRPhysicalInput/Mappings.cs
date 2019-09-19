@@ -58,7 +58,8 @@ namespace VTOLVRPhysicalInput
     {
         public string InputAxis { get; set; }
         public bool Invert { get; set; }
-        public string OutputDevice { get; set; } // ToDo: Make enum
+        public string OutputDevice { get; set; }
+        public string OutputSet { get; set; }
         public string MappingRange { get; set; }
         public string OutputComponent { get; set; }
     }
@@ -75,6 +76,7 @@ namespace VTOLVRPhysicalInput
     {
         public int InputButton { get; set; }
         public string OutputDevice { get; set; }
+        public string OutputSet { get; set; }
         public string OutputComponent { get; set; }
         public float Direction { get; set; }
     }
@@ -98,6 +100,7 @@ namespace VTOLVRPhysicalInput
     {
         public int InputPov { get; set; }
         public string OutputDevice { get; set; }
+        public string OutputSet { get; set; }
     }
     #endregion
 }

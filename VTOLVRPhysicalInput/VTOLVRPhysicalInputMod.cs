@@ -302,7 +302,10 @@ namespace VTOLVRPhysicalInput
                         if (mappedStick.AxisToVectorComponentMappings.TryGetValue(state.Offset, out var vectorComponentMapping))
                         {
                             var device = _outputDevices[vectorComponentMapping.OutputDevice];
-                            device.SetAxis(vectorComponentMapping.OutputComponent, ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
+                            device.SetAxis(
+                                vectorComponentMapping.OutputComponent,
+                                vectorComponentMapping.OutputSet,
+                                ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
                         }
                     }
                     else if (ov <= 44)
@@ -313,8 +316,8 @@ namespace VTOLVRPhysicalInput
                             //Log(($"PovToTouchpad: POV={state.Offset}, Value={state.Value}, OutputDevice={touchpadMapping.OutputDevice}"));
                             var vec = _povAngleToVector3[state.Value];
                             var device = _outputDevices[touchpadMapping.OutputDevice];
-                            device.SetAxis("X", vec.x);
-                            device.SetAxis("Y", vec.y);
+                            device.SetAxis("X", touchpadMapping.OutputSet, vec.x);
+                            device.SetAxis("Y", touchpadMapping.OutputSet, vec.y);
                         }
                     }
                     else if (ov <= 175)
@@ -324,7 +327,10 @@ namespace VTOLVRPhysicalInput
                         {
                             //Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));
                             var device = _outputDevices[buttonToVectorMapping.OutputDevice];
-                            device.SetAxis(buttonToVectorMapping.OutputComponent, state.Value == 128 ? buttonToVectorMapping.Direction : 0);
+                            device.SetAxis(
+                                buttonToVectorMapping.OutputComponent, 
+                                buttonToVectorMapping.OutputSet,
+                                state.Value == 128 ? buttonToVectorMapping.Direction : 0);
                         }
 
                     }
