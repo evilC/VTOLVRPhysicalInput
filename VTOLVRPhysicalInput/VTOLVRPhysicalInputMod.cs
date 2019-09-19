@@ -36,6 +36,7 @@ namespace VTOLVRPhysicalInput
 
         private OutputDevice _outputStick;
         private OutputDevice _outputThrottle;
+        private Dictionary<string, OutputDevice> _outputDevices;
 
         private static Dictionary<int, Vector3> _povAngleToVector3 = new Dictionary<int, Vector3>
         {
@@ -107,13 +108,13 @@ namespace VTOLVRPhysicalInput
             {
                 _outputStick
                     .AddAxisSetDelegate("StickXyz", TestingUpdateStickXyz)
-                    .AddAxisSetDelegate("Touchpad", TestingUpdateStickTocuhpad);
+                    .AddAxisSetDelegate("Touchpad", TestingUpdateStickTouchpad);
             }
             else
             {
                 _outputStick
                     .AddAxisSetDelegate("StickXyz", UpdateStickXyz)
-                    .AddAxisSetDelegate("Touchpad", UpdateStickTocuhpad);
+                    .AddAxisSetDelegate("Touchpad", UpdateStickTouchpad);
             }
 
             // Throttle Output
@@ -134,6 +135,8 @@ namespace VTOLVRPhysicalInput
                     .AddAxisSetDelegate("Throttle", UpdateThrottlePower)
                     .AddAxisSetDelegate("Touchpad", UpdateThrottleTouchpad);
             }
+
+            _outputDevices = new Dictionary<string, OutputDevice> {{"Stick", _outputStick}, { "Throttle", _outputThrottle} };
         }
 
         private void UpdateStickXyz(Dictionary<string, float> values)
@@ -146,12 +149,12 @@ namespace VTOLVRPhysicalInput
             Log($"Update StickXyz: {values.ToDebugString()}");
         }
 
-        private void UpdateStickTocuhpad(Dictionary<string, float> values)
+        private void UpdateStickTouchpad(Dictionary<string, float> values)
         {
             _vrJoystick.OnSetThumbstick.Invoke(new Vector3(values["X"], values["Y"], values["Z"]));
         }
 
-        private void TestingUpdateStickTocuhpad(Dictionary<string, float> values)
+        private void TestingUpdateStickTouchpad(Dictionary<string, float> values)
         {
             Log($"Update StickTouchpad: {values.ToDebugString()}");
         }
@@ -298,14 +301,8 @@ namespace VTOLVRPhysicalInput
                         // Axes
                         if (mappedStick.AxisToVectorComponentMappings.TryGetValue(state.Offset, out var vectorComponentMapping))
                         {
-                            if (vectorComponentMapping.OutputDevice == "Stick")
-                            {
-                                _outputStick.SetAxis(vectorComponentMapping.OutputComponent, ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
-                            }
-                            else
-                            {
-                                _outputThrottle.SetAxis(vectorComponentMapping.OutputComponent, ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
-                            }
+                            var device = _outputDevices[vectorComponentMapping.OutputDevice];
+                            device.SetAxis(vectorComponentMapping.OutputComponent, ConvertAxisValue(state.Value, vectorComponentMapping.Invert, vectorComponentMapping.MappingRange));
                         }
                     }
                     else if (ov <= 44)
@@ -315,16 +312,9 @@ namespace VTOLVRPhysicalInput
                         {
                             //Log(($"PovToTouchpad: POV={state.Offset}, Value={state.Value}, OutputDevice={touchpadMapping.OutputDevice}"));
                             var vec = _povAngleToVector3[state.Value];
-                            if (touchpadMapping.OutputDevice == "Stick")
-                            {
-                                _outputStick.SetAxis("X", vec.x);
-                                _outputStick.SetAxis("Y", vec.y);
-                            }
-                            else if (touchpadMapping.OutputDevice == "Throttle")
-                            {
-                                _outputThrottle.SetAxis("X", vec.x);
-                                _outputThrottle.SetAxis("Y", vec.y);
-                            }
+                            var device = _outputDevices[touchpadMapping.OutputDevice];
+                            device.SetAxis("X", vec.x);
+                            device.SetAxis("Y", vec.y);
                         }
                     }
                     else if (ov <= 175)
@@ -333,10 +323,8 @@ namespace VTOLVRPhysicalInput
                         if (mappedStick.ButtonToVectorComponentMappings.TryGetValue(state.Offset, out var buttonToVectorMapping))
                         {
                             //Log(($"ButtonToVector: Button={state.Offset}, Value={state.Value}, OutputDevice={buttonToVectorMapping.OutputDevice}, Component={buttonToVectorMapping.OutputComponent}"));
-                            if (buttonToVectorMapping.OutputDevice == "Throttle")
-                            {
-                                _outputThrottle.SetAxis(buttonToVectorMapping.OutputComponent, state.Value == 128 ? buttonToVectorMapping.Direction : 0);
-                            }
+                            var device = _outputDevices[buttonToVectorMapping.OutputDevice];
+                            device.SetAxis(buttonToVectorMapping.OutputComponent, state.Value == 128 ? buttonToVectorMapping.Direction : 0);
                         }
 
                     }
