@@ -37,7 +37,8 @@ namespace VTOLVRPhysicalInput
         public OutputDevice AddAxisSet(string setName, List<string> axisNames)
         {
             _axisSetStates.Add(setName, new Dictionary<string, float>());
-            _axisSetChanged.Add(setName, false);
+            //_axisSetChanged.Add(setName, false);
+            _axisSetChanged.Add(setName, true); // Enable Axis updates every frame for now
             foreach (var axisName in axisNames)
             {
                 _axisSetStates[setName].Add(axisName, 0);
@@ -69,7 +70,7 @@ namespace VTOLVRPhysicalInput
         {
             var setStates = _axisSetStates[setName];
             setStates[axisName] = value;
-            _axisSetChanged[setName] = true;
+            //_axisSetChanged[setName] = true;
         }
 
         public void SetButton(string buttonName, bool value)
@@ -86,7 +87,7 @@ namespace VTOLVRPhysicalInput
                 if (!_axisSetChanged[setName]) continue;
                 var setStates = _axisSetStates[setName];
                 setDelegate.Value(setStates);
-                _axisSetChanged[setName] = false;
+                //_axisSetChanged[setName] = false;
             }
 
             foreach (var buttonDelegate in _buttonDelegates)
