@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace VTOLVRPhysicalInput
 {
-    [Info("VTOLVR Physical Input", "Allows using of physical input devices in VTOL VR", "https://github.com/evilC/VTOLVRPhysicalInput", "0.0.2")]
+    [Info("VTOLVR Physical Input", "Allows using of physical input devices in VTOL VR", "0.0.2")]
     public class VtolVrPhysicalInput : VTOLMOD
     {
         public static DirectInput DiInstance = new DirectInput();
