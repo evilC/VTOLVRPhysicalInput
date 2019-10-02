@@ -87,7 +87,7 @@ namespace VTOLVRPhysicalInput
         public void InitUpdates(bool standaloneTesting = false)
         {
             // Stick Output
-            _outputStick = new OutputDevice();
+            _outputStick = new OutputDevice("Stick");
             _outputStick
                 .AddAxisSet("StickXyz", new List<string> {"Roll", "Pitch", "Yaw"})
                 .AddAxisSet("Touchpad", new List<string> {"X", "Y", "Z"})
@@ -98,7 +98,7 @@ namespace VTOLVRPhysicalInput
             {
                 _outputStick
                     .AddAxisSetDelegate("StickXyz", TestingUpdateStickXyz)
-                    .AddAxisSetDelegate("Touchpad", TestingUpdateStickTouchpad)
+                    .AddTouchpadDelegate(TestingUpdateStickTouchpad)
                     .AddButtonDelegate("Menu", TestingUpdateStickMenuButton)
                     .AddButtonDelegate("Trigger", TestingUpdateStickTriggerButton);
             }
@@ -106,13 +106,13 @@ namespace VTOLVRPhysicalInput
             {
                 _outputStick
                     .AddAxisSetDelegate("StickXyz", UpdateStickXyz)
-                    .AddAxisSetDelegate("Touchpad", UpdateStickTouchpad)
+                    .AddTouchpadDelegate(UpdateStickTouchpad)
                     .AddButtonDelegate("Menu", UpdateStickMenuButton)
                     .AddButtonDelegate("Trigger", UpdateStickTriggerButton);
             }
 
             // Throttle Output
-            _outputThrottle = new OutputDevice();
+            _outputThrottle = new OutputDevice("Throttle");
             _outputThrottle
                 .AddAxisSet("Throttle", new List<string> {"Throttle"})
                 .AddAxisSet("Touchpad", new List<string> {"X", "Y", "Z"})
@@ -150,14 +150,22 @@ namespace VTOLVRPhysicalInput
             Log($"Update StickXyz: {values.ToDebugString()}");
         }
 
-        private void UpdateStickTouchpad(Dictionary<string, float> values)
+        private void UpdateStickTouchpad(Dictionary<string, float> values, bool pressed)
         {
-            _vrJoystick.OnSetThumbstick.Invoke(new Vector3(values["X"], values["Y"], values["Z"]));
+            if (pressed)
+            {
+                _vrJoystick.OnSetThumbstick.Invoke(new Vector3(values["X"], values["Y"], values["Z"]));
+            }
+            else
+            {
+                // Upon release, Reset Thumbstick so TGP acquires target
+                _vrJoystick.OnResetThumbstick.Invoke();
+            }
         }
 
-        private void TestingUpdateStickTouchpad(Dictionary<string, float> values)
+        private void TestingUpdateStickTouchpad(Dictionary<string, float> values, bool pressed)
         {
-            Log($"Update StickTouchpad: {values.ToDebugString()}");
+            Log($"Update StickTouchpad: {values.ToDebugString()}, pressed: {pressed}");
         }
 
         private void UpdateStickMenuButton(bool value)
@@ -303,8 +311,7 @@ namespace VTOLVRPhysicalInput
                             //Log(($"PovToTouchpad: POV={state.Offset}, Value={state.Value}, OutputDevice={touchpadMapping.OutputDevice}"));
                             var vec = PovAngleToVector3[state.Value];
                             var device = _outputDevices[touchpadMapping.OutputDevice];
-                            device.SetAxis("X", touchpadMapping.OutputSet, vec.x);
-                            device.SetAxis("Y", touchpadMapping.OutputSet, vec.y);
+                            device.SetTouchpad(vec.x, vec.y);
                         }
                     }
                     else if (ov <= 175)

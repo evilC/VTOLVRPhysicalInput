@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace VTOLVRPhysicalInput
 {
     public class OutputDevice
     {
+        private string _name;
+
         // Latest state of each axis
         //private readonly Dictionary<string, float> _axisStates = new Dictionary<string, float>();
         private readonly Dictionary<
@@ -24,6 +24,14 @@ namespace VTOLVRPhysicalInput
         private readonly Dictionary</* Set Name */string, Action<Dictionary<string, float>>> _axisSetDelegates 
             = new Dictionary<string, Action<Dictionary<string, float>>>();
 
+        private Dictionary<string, float> _touchpadState
+            = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase){{"X", 0}, {"Y", 0}, {"Z", 0}};
+        private bool _touchpadPressed;
+        private bool _touchpadLastPressed;
+
+        // Function to call on SendUpdates for each set of Touchpad
+        private Action<Dictionary<string, float>, bool> _touchpadDelegate;
+
         private readonly Dictionary<string, bool> _buttonStates
             = new Dictionary<string, bool>();
 
@@ -33,6 +41,11 @@ namespace VTOLVRPhysicalInput
         // Functions to call on SendUpdates for each Button
         private readonly Dictionary<string, Action<bool>> _buttonDelegates
             = new Dictionary<string, Action<bool>>();
+
+        public OutputDevice(string name)
+        {
+            _name = name;
+        }
 
         public OutputDevice AddAxisSet(string setName, List<string> axisNames)
         {
@@ -50,6 +63,12 @@ namespace VTOLVRPhysicalInput
         public OutputDevice AddAxisSetDelegate(string setName, Action<Dictionary<string, float>> setDelegate)
         {
             _axisSetDelegates.Add(setName, setDelegate);
+            return this;
+        }
+
+        public OutputDevice AddTouchpadDelegate(Action<Dictionary<string, float>, bool> tpDelegate)
+        {
+            _touchpadDelegate = tpDelegate;
             return this;
         }
 
@@ -79,6 +98,13 @@ namespace VTOLVRPhysicalInput
             _buttonChanged[buttonName] = true;
         }
 
+        public void SetTouchpad(float x, float y)
+        {
+            _touchpadState["X"] = x;
+            _touchpadState["Y"] = y;
+            _touchpadPressed = (Math.Abs(x) > 0 || Math.Abs(y) > 0);
+        }
+
         public void SendUpdates()
         {
             foreach (var setDelegate in _axisSetDelegates)
@@ -96,8 +122,22 @@ namespace VTOLVRPhysicalInput
                 buttonDelegate.Value(_buttonStates[buttonDelegate.Key]);
                 _buttonChanged[buttonDelegate.Key] = false;
             }
+
+            // If Touchpad went from Pressed to Unpressed, or Touchpad is pressed, send TP update
+            if (_touchpadDelegate != null)
+            {
+                if (_touchpadPressed || (!_touchpadPressed && _touchpadLastPressed))
+                {
+                    _touchpadDelegate(_touchpadState, _touchpadPressed);
+                }
+                _touchpadLastPressed = _touchpadPressed;
+            }
         }
 
-        
+        private void Log(string text)
+        {
+            System.Diagnostics.Debug.WriteLine($"PhysicalStickMod| Device: {_name} | {text}");
+        }
+
     }
 }

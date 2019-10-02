@@ -15,6 +15,8 @@ Low = Map to low (-1..0) range
 ### Deprecated
 ### Removed
 ### Fixed
+- TGP targetting now works  
+When mapping POV to thumbstick of Joystick, on center of POV stick, release signal is sent
 
 ## [0.0.2] - 2019-09-15
 ### Added
