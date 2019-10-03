@@ -83,6 +83,11 @@
       <PressValue>1</PressValue>
       <ReleaseValue>0</ReleaseValue>
     </ButtonToVectorComponent>
-
+  <!--Countermeasures-->
+    <ButtonToButton>
+      <InputButton>1</InputButton>
+      <OutputDevice>Throttle</OutputDevice>
+      <OutputButton>Menu</OutputButton>
+    </ButtonToButton>
   </StickMappings>
 </Mappings>

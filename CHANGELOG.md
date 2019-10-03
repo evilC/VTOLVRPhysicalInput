@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Full = Map to full (-1..1) range  
 High = Map to high (0..1) range  
 Low = Map to low (-1..0) range
+- Implement Throttle Menu button support
 ### Changed
 - Previous button states checked to stop repeated spamming of button down / up events
 - Streamline of code, reduce number of XML tags

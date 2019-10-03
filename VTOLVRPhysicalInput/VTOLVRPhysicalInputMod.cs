@@ -125,6 +125,7 @@ namespace VTOLVRPhysicalInput
                 _outputThrottle
                     .AddAxisSetDelegate("Throttle", TestingUpdateThrottlePower)
                     .AddAxisSetDelegate("Touchpad", TestingUpdateThrottleTouchpad)
+                    .AddButtonDelegate("Menu", TestingUpdateThrottleMenuButton)
                     .AddAxisSetDelegate("Trigger", TestingUpdateThrottleTriggerAxis);
             }
             else
@@ -132,6 +133,7 @@ namespace VTOLVRPhysicalInput
                 _outputThrottle
                     .AddAxisSetDelegate("Throttle", UpdateThrottlePower)
                     .AddAxisSetDelegate("Touchpad", UpdateThrottleTouchpad)
+                    .AddButtonDelegate("Menu", UpdateThrottleMenuButton)
                     .AddAxisSetDelegate("Trigger", UpdateThrottleTriggerAxis);
             }
 
@@ -206,6 +208,17 @@ namespace VTOLVRPhysicalInput
         private void UpdateThrottleTouchpad(Dictionary<string, float> values)
         {
             _vrThrottle.OnSetThumbstick.Invoke(new Vector3(values["X"], values["Y"], values["Z"]));
+        }
+
+        private void UpdateThrottleMenuButton(bool value)
+        {
+            if (value) _vrThrottle.OnMenuButtonDown.Invoke();
+            else _vrThrottle.OnMenuButtonUp.Invoke();
+        }
+
+        private void TestingUpdateThrottleMenuButton(bool value)
+        {
+            Log($"Update ThrottleMenuButton: {value}");
         }
 
         private void TestingUpdateThrottleTouchpad(Dictionary<string, float> values)
