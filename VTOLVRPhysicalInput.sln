@@ -7,8 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VTOLVRPhysicalInput", "VTOL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{A24A28E5-5361-4FB0-99E7-7DDBF8B781E0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{336D8B26-49AF-4555-BF2C-1AB8D4374BD9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XML", "XML", "{336D8B26-49AF-4555-BF2C-1AB8D4374BD9}"
 	ProjectSection(SolutionItems) = preProject
+		info.xml = info.xml
 		VTOLVRPhysicalInputSettings.xml = VTOLVRPhysicalInputSettings.xml
 	EndProjectSection
 EndProject

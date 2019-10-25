@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Xml.Serialization;
 using SharpDX.DirectInput;
 using UnityEngine;
@@ -9,7 +10,6 @@ using UnityEngine.SceneManagement;
 
 namespace VTOLVRPhysicalInput
 {
-    [Info("VTOLVR Physical Input", "Allows using of physical input devices in VTOL VR", "0.0.2")]
     public class VtolVrPhysicalInput : VTOLMOD
     {
         public static DirectInput DiInstance = new DirectInput();
@@ -51,9 +51,9 @@ namespace VTOLVRPhysicalInput
 
         public void InitSticks(bool standaloneTesting = false)
         {
-            ProcessSettingsFile(standaloneTesting);
             Log("DBGVIEWCLEAR");
             Log("VTOL VR Mod loaded");
+            ProcessSettingsFile(standaloneTesting);
             var diDeviceInstances = DiInstance.GetDevices();
 
             var foundSticks = new Dictionary<string, Joystick>();
@@ -416,11 +416,12 @@ namespace VTOLVRPhysicalInput
             }
             else
             {
-                settingsFile = Path.Combine(Directory.GetCurrentDirectory(), @"VTOLVR_ModLoader\Mods\VTOLVRPhysicalInputSettings.xml");
+                settingsFile = Path.Combine(Directory.GetCurrentDirectory(), @"VTOLVR_ModLoader\Mods\VTOLVRPhysicalInput\VTOLVRPhysicalInputSettings.xml");
             }
             
             if (File.Exists(settingsFile))
             {
+                Log($"Loading Settings file from {settingsFile}");
                 var deserializer = new XmlSerializer(typeof(Mappings));
                 TextReader reader = new StreamReader(settingsFile);
                 var obj = deserializer.Deserialize(reader);
