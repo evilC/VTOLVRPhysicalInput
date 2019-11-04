@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+
+## [0.0.3] - 2019-11-05
+### Added
 - Add MappingRange element to AxisToFloatMapping
 Full = Map to full (-1..1) range  
 High = Map to high (0..1) range  
